@@ -14,6 +14,9 @@ output:
     toc_depth: '4'
 fontsize: 12pt
 urlcolor: blue
+editor_options: 
+  markdown: 
+    wrap: 72
 ---
 
 ```{r setup, include=FALSE}
@@ -25,174 +28,83 @@ knitr::opts_chunk$set(
 ```
 
 ## Problem 1
+
 Since a population is partitioned into disjoint groups, we should have
 $$
 P(H_1)+P(H_2)+P(H_3)=1
-$$
-We can calculate $P(H_i|E)$ explicitly using the formula.
-$$
+$$ According to Bayes theorem, $$
 \begin{aligned}
-P(H_i|E) = \frac{P(E|H_i) P(H_i)}{\sum_{i=1}^3 P(E|H_i)P(H_i)}
+P(H_i|E) \propto {P(E|H_i) P(H_i)}
 \end{aligned}
-$$
-From this, we observe that $P(H_i|E)$ all have the same denominator, so the comparisons among them only depend on the numerator.
+$$ 
 
-For $P(E|H_i)$, we have 
-$$
+
+For $P(E|H_i)$, we have $$
 P(E|H_1)=0.1,\quad P(E|H_2)=0.3,\quad P (E|H_3)=0.5
-$$
-Therefore
+$$ Therefore
 
-\noindent(a) 
-We set marginal probabilities to be
+(a) 
+We can set marginal probabilities to be 
+$$P(H_1) = 0.1,\quad P(H_2)=0.8,\quad P(H_3)=0.1$$ 
+Then we have $$
+\begin{aligned}
+    &0.1P(H_1) < 0.5P(H_3) < 0.3P(H_2) \\
+    \Rightarrow &P(E\mid H_1)P(H_1) < P(E\mid H_3)P(H_3) < P(E\mid H_2)P(H_2)
+\end{aligned}  
 $$
-P(H_1) = 0.1,\quad P(H_2)=0.8,\quad P(H_3)=0.1
-$$
-
-Then, we have
-$$
-0.1P(H_1) < 0.5P(H_3) < 0.3P(H_2)
-$$
-
-i.e.
-$$
-P(E\mid H_1)P(H_1) < P(E\mid H_3)P(H_3) < P(E\mid H_2)P(H_2)
-$$
-
-Since P(E) > 0, we can divide each of them by P(E)
-$$
-\frac{P(E\mid H_1)P(H_1)}{P(E)} < \frac{P(E\mid H_3)P(H_3)}{P(E)}< \frac{P(E\mid H_2)P(H_2)}{P(E)}
-$$
-
-i.e.
-$$
-\frac{P(E\cap H_1)}{P(E)} < \frac{P(E\cap H_3)}{P(E)}< \frac{P(E\cap H_2)}{P(E)}
-$$
-
-Thus, we get
-$$
+Equivalently, $$
 P(H_1\mid E) < P(H_3\mid E) < P(H_2\mid E)
 $$
 
-
-\noindent(b) 
-We set marginal probabilities to be
-$$
+(b) We can set marginal probabilities to be $$
 P(H_1) = 0.4,\quad P(H_2)=0.1,\quad P(H_3)=0.5
+$$Then we have$$
+\begin{aligned}
+    & 0.3P(H_2) < 0.1P(H_1) < 0.5P(H_3)\\
+   \Rightarrow&  P(E\mid H_2)P(H_2) < P(E\mid H_1)P(H_1) < P(E\mid H_3)P(H_3)
+\end{aligned}
 $$
-Then, we have
-$$
-0.3P(H_2) < 0.1P(H_1) < 0.5P(H_3)
-$$
-i.e.
-$$
-P(E\mid H_2)P(H_2) < P(E\mid H_1)P(H_1) < P(E\mid H_3)P(H_3)
-$$
-
-Since P(E) > 0, we can divide each of them by P(E)
-$$
-\frac{P(E\mid H_2)P(H_2)}{P(E)} < \frac{P(E\mid H_1)P(H_1)}{P(E)}< \frac{P(E\mid H_3)P(H_3)}{P(E)}
-$$
-i.e.
-$$
-\frac{P(E\cap H_2)}{P(E)} < \frac{P(E\cap H_1)}{P(E)}< \frac{P(E\cap H_3)}{P(E)}
-$$
-
-Thus, we get
-$$
+Equivalently, $$
 P(H_2\mid E) < P(H_1\mid E) < P(H_3\mid E)
 $$
 
-
-\noindent(c) 
-We set marginal probabilities to be
-$$
-P(H_1) = 0.8,\quad P(H_2)=0.1,\quad P(H_3)=0.1
-$$
-Then, we have
-$$
-0.3P(H_2) < 0.5P(H_3) < 0.1P(H_1)
-$$
-i.e.
-$$
-P(E\mid H_2)P(H_2) < P(E\mid H_3)P(H_3) < P(E\mid H_1)P(H_1)
-$$
-
-Since P(E) > 0, we can divide each of them by P(E)
-$$
-\frac{P(E\mid H_2)P(H_2)}{P(E)} < \frac{P(E\mid H_3)P(H_3)}{P(E)}< \frac{P(E\mid H_1)P(H_1)}{P(E)}
-$$
-i.e.
-$$
-\frac{P(E\cap H_2)}{P(E)} < \frac{P(E\cap H_3)}{P(E)}< \frac{P(E\cap H_1)}{P(E)}
-$$
-
-Thus, we get
-$$
+(c) We can set marginal probabilities to be $$
+    P(H_1) = 0.8,\quad P(H_2)=0.1,\quad P(H_3)=0.1
+    $$ Then we have $$
+\begin{aligned}
+    &0.3P(H_2) < 0.5P(H_3) < 0.1P(H_1)\\
+    \Rightarrow &P(E\mid H_2)P(H_2) < P(E\mid H_3)P(H_3) < P(E\mid H_1)P(H_1)
+\end{aligned}
+    $$Equivalently, $$
 P(H_2\mid E) < P(H_3\mid E) < P(H_1\mid E)
 $$
 
-
-\noindent(d) 
-We set marginal probabilities to be
-$$
-P(H_1) = 0.7,\quad P(H_2)=0.2,\quad P(H_3)=0.1
-$$
-Then, we have
-$$
-0.5P(H_3) < 0.3P(H_2) < 0.1P(H_1)
-$$
-i.e.
-$$
-P(E\mid H_3)P(H_3) < P(E\mid H_2)P(H_2) < P(E\mid H_1)P(H_1)
-$$
-
-Since P(E) > 0, we can divide each of them by P(E)
-$$
-\frac{P(E\mid H_3)P(H_3)}{P(E)} < \frac{P(E\mid H_2)P(H_2)}{P(E)}< \frac{P(E\mid H_1)P(H_1)}{P(E)}
-$$
-i.e.
-$$
-\frac{P(E\cap H_3)}{P(E)} < \frac{P(E\cap H_2)}{P(E)}< \frac{P(E\cap H_1)}{P(E)}
-$$
-
-Thus, we get
-$$
+(d) We can set marginal probabilities to be $$
+    P(H_1) = 0.7,\quad P(H_2)=0.2,\quad P(H_3)=0.1
+    $$ Then we have $$
+\begin{aligned}
+    &0.5P(H_3) < 0.3P(H_2) < 0.1P(H_1)\\
+    \Rightarrow &P(E\mid H_3)P(H_3) < P(E\mid H_2)P(H_2) < P(E\mid H_1)P(H_1)
+\end{aligned}
+    $$
+Equivalently, $$
 P(H_3\mid E) < P(H_2\mid E) < P(H_1\mid E)
 $$
 
-
-\noindent(e) 
-We set marginal probabilities to be
+(e) We can set marginal probabilities to be $$
+    P(H_1) = 0.6,\quad P(H_2)=0.3,\quad P(H_3)=0.1
+    $$ Then we have $$
+\begin{aligned}
+&0.5P(H_3) < 0.1P(H_1) < 0.3P(H_2)\\
+\Rightarrow &P(E\mid H_3)P(H_3) < P(E\mid H_1)P(H_1) < P(E\mid H_2)P(H_2) 
+\end{aligned}
 $$
-P(H_1) = 0.6,\quad P(H_2)=0.3,\quad P(H_3)=0.1
-$$
-
-Then, we have
-$$
-0.5P(H_3) < 0.1P(H_1) < 0.3P(H_2)
-$$
-i.e.
-$$
-P(E\mid H_3)P(H_3) < P(E\mid H_1)P(H_1) < P(E\mid H_2)P(H_2) 
-$$
-
-Since P(E) > 0, we can divide each of them by P(E)
-$$
-\frac{P(E\mid H_3)P(H_3)}{P(E)} < \frac{P(E\mid H_1)P(H_1)}{P(E)} < \frac{P(E\mid H_2)P(H_2)}{P(E)} 
-$$
-i.e.
-$$
-\frac{P(E\cap H_3)}{P(E)} < \frac{P(E\cap H_1)}{P(E)} < \frac{P(E\cap H_2)}{P(E)}
-$$
-
-Thus, we get
-$$
+Equivalently, $$
 P(H_3\mid E) < P(H_1\mid E) < P(H_2\mid E)
 $$
 
-
 Check
+
 ```{r p1}
 pE_H <- c(0.1,0.3,0.5)
 pH <- matrix(c(0.3,0.4,0.8,0.7,0.6,
@@ -206,160 +118,156 @@ t(apply(pH_E, 1, order))
 ```
 
 ## Problem 2
-Let $L_1,L_2,L_3$ denote the car is located behind Door 1,2,3, resp. Let $H_1,H_2,H_3$ denote the host open Door 1,2,3, resp.
 
-Before the game,
-$$
+Let $L_1,L_2,L_3$ denote the car is located behind Door 1,2,3, resp. Let
+$H_1,H_2,H_3$ denote the host open Door 1,2,3, resp.
+
+Before the game, $$
 P(L_1)=P(L_2)=P(L_3)=\frac{1}{3}
 $$
 
-The probability of winning (if switching) is
-$$
+The probability of winning (if switching) is $$
 \begin{aligned}
 P(\text{win}|H_3) &= P(L_2|H_3) \\
 &=\frac{P(H_3|L_2)P(L_2)}{P(H_3|L_1)P(L_1)+P(H_3|L_2)P(L_2)+P(H_3|L_3)P(L_3)} \\
 &= \frac{P(H_3|L_2)}{P(H_3|L_1)+P(H_3|L_2)+P(H_3|L_3)}
 \end{aligned}
-$$
-For these conditional probabilities, $H_3|L_3$ is impossible, so $P(H_3|L_3)=0$. For $H_3|L_2$, the host has not choice rather opening Door 3, so $P(H_3|L_2)=1$.    
-For $H_3|L_1$, since the car is in neither Door 2 nor 3, the host can randomly choose from the two doors. Note that the prob host open Door 2 or 3 depends on his location.
+$$ For these conditional probabilities, $H_3|L_3$ is impossible, so
+$P(H_3|L_3)=0$. For $H_3|L_2$, the host has not choice rather opening
+Door 3, so $P(H_3|L_2)=1$.\
+For $H_3|L_1$, since the car is in neither Door 2 nor 3, the host can
+randomly choose from the two doors. Note that the prob host open Door 2
+or 3 depends on his location.
 
-(1) Suppose the host is closer to Door 2, then $P(H_3|L_1)=1-\gamma \in (0,1/2]$. So 
-$$
-P(\text{win}|H_3) = \frac{1}{1-\gamma+1} = \frac{1}{2-\gamma} \in [\frac{2}{3}, 1)
-$$
-Since $P(\text{win}|H_3) \geq \frac{2}{3} > \frac{1}{2}$, the probability of winning is higher by switching.
+(1) Suppose the host is closer to Door 2, then
+    $P(H_3|L_1)=1-\gamma \in (0,1/2]$. So $$
+    P(\text{win}|H_3) = \frac{1}{1-\gamma+1} = \frac{1}{2-\gamma} \in [\frac{2}{3}, 1)
+    $$ Since $P(\text{win}|H_3) \geq \frac{2}{3} > \frac{1}{2}$, the
+    probability of winning is higher by switching.
 
-(2) Suppose the host is closer to Door 3, then $P(H_3|L_1)=\gamma \in [1/2, 1)$. So 
-$$
-P(\text{win}|H_3) = \frac{1}{\gamma+1}  \in (\frac{1}{2}, \frac{2}{3}]
-$$
-Since $P(\text{win}|H_3)  > \frac{1}{2}$, the probability of winning is higher by switching.
+(2) Suppose the host is closer to Door 3, then
+    $P(H_3|L_1)=\gamma \in [1/2, 1)$. So $$
+    P(\text{win}|H_3) = \frac{1}{\gamma+1}  \in (\frac{1}{2}, \frac{2}{3}]
+    $$ Since $P(\text{win}|H_3) > \frac{1}{2}$, the probability of
+    winning is higher by switching.
 
-By (1),(2), no matter where the host is, under $\gamma \in [1/2,1)$, the player will have a better chance of winning by always switching the door
-
+By (1),(2), no matter where the host is, under $\gamma \in [1/2,1)$, the
+player will have a better chance of winning by always switching the door
 
 ## Problem 3
 
-First, we use a Bayesian Network to represent their relationships. We use the following information to construct this DAG.
+First, we use a Bayesian Network to represent their relationships. We
+use the following information to construct this DAG.
 
+DAG:
+```{r p3}
+Sys.setenv(LANGUAGE = "en")
+library(dagitty)
+library(ggdag)
+dag <- dagitty::dagitty("
+       dag{
+       Y->X
+       Y->Z
+       X->Z
+       Y->U
+       X->U
+       X->V
+       Y->V
+       X->W
+       Y->W
+       }              
+        ")
+tidy_dag <- tidy_dagitty(dag)
+ggdag(tidy_dag)+theme_dag()
+```
 
-Second, we specify the domain, distribution, and parameters of each random variable resp.
-
-1. $X$ represents the person’s age and takes value in the set of natural numbers.
-
-The random variable $X$ is a discrete random variable given that the
-support is a countably infinite set as
-$$
-\{x \mid x \in (0, 1, 2,...,)\}
-$$
-We assume it follows Beta-binomial distribution.The PDF is given by:
-$$
-P(X = k) = \binom{n}{k} \frac{B(k + \alpha, n - k + \beta)}{B(\alpha, \beta)}
-$$
-where $B()$is the Beta function.It is characterized by three parameters: $\alpha$, $\beta$, $n$. n is the number of Bernoulli trials, n can be any non-negative integer, i.e.
-$$
-\{n \mid n \in (0, 1, 2,...,)\}
-$$
-$\alpha$ is one of the two shape parameters of the underlying Beta distribution. It must be positive. Thus, its range is $\alpha$ > 0. $\beta$ is the second shape parameter of the underlying Beta distribution, it must also be positive. Thus, its range is $\beta$ > 0
-
-2. $Y$ represents the country the person is from.
-
-The random variable $Y$ is a discrete random variable given that the
-support is a finite set as
-$$
-\{y \mid y \in (C_1,  C_2,  C_3,..., C_{195})\}
-$$
-We know that the possibility that a person is from a country depends on the population. Since we know the number is known, there is no parameter. The PDF is given by:
-$$
-P(Y = C_i) = \frac{\text{Population of country } C_i}{\text{Population of the world}}
-$$
-
-3. $Z$ represents whether the person attended a picnic the first week of July, 2023.
-The random variable $Z$ is a binary random variable that can take 0 or 1.
-$$
-\{z \mid z \in \{0,1\}\}
-$$
-
-Obviously it follows Bernoulli distribution.The PDF is given by:
-$$
-P(Z = z) = p^z (1-p)^{1-z}\\ z \in \{0,1\}
-$$
-where parameter $p$ is the probability of attending a picnic, here we consider the range of it is [0,1].
-
-4. $U$ represents the amount of coffee the person consumed in 2023.
-The random variable $U$ is a continuous random variable that takes value greater than zero.
-$$
-\{u \mid u \in [0, \infty )\}
-$$
-We assume it follows gamma distribution.The PDF is given by:
-$$
-f(x;\alpha,\beta) = \frac{\beta^\alpha x^{\alpha-1} e^{-\beta x}}{\Gamma(\alpha)}
-$$
-With a shape parameter $alpha$ and a scale parameter $beta$. The range of the parameters are $\alpha$ > 0 and $\beta$ > 0
-
-
-5. $V$ represents the amount of screen time the person spends in each of the 24 hours on September 1, 2023.
-In each of the 24 hours, we assume the screen time (in hour unit) $v_i$ follow a beta distribution which takes value from 0 to 1. And it's reasonable to assume each hour is independent. So V is a vector random variable with the distribution
-$$
-\mathbf{V} = (V_1, V_2, \ldots, V_{24}) \\
-\text{where for each } i \in \{1, 2, \ldots, 24\}: \\
-V_i \sim \text{Beta}(\alpha_i, \beta_i), \quad i.i.d.\\
-$$
-The pdf of the joint distribution is 
-$$
-f(\mathbf{V}) = \prod_{i=1}^{24} \frac{v_i^{\alpha_i - 1} (1 - v_i)^{\beta_i - 1}}{B(\alpha_i, \beta_i)}
-$$
-
-with the support of each $V_i$ in the following. And the parameters' range is $\alpha_i$ > 0 and $\beta_i$ > 0.
-$$
-\{v_i \mid v_i \in [0, 1 ]\}
-$$
-
-
-
-
-6. $W$ represents a passport photo of the person.
-
-
-
-7. Country ($Y$) influences age ($X$) structure.
-8. Country ($Y$) and age ($X$) influence whether the person attended a picnic ($Z$), since country reflects cultural and different age has different opinion and tendency for a picnic.  
-9. Age ($X$) influences coffee consumed ($U$) and screen time spent ($V$). For example, young age needs working, so maybe more coffee and screen time.
-10. Screen time ($V$) influences coffee consumed($U$).
-11. Country ($Y$) influences passport photo ($W$).
-12. All the term "influence" above means Markovian parents of the variable.
-13. All distribution above also means conditional distribution.
-
-
-
-Since there's no collider or any separate node in this DAG, we conclude that $X,Y,Z,U,V,W$ are not pairwise independently distributed.
-
-As for joint distribution, it's easy to read from the DAG.
-$$
+Under this assumption, the pdf of the joint distribution is: $$
 \begin{aligned}
-f(x,y,z,u,v,w) = f(x|y)f(y)f(z|x,y)f(u|x,v)f(v|x)f(w|y)
+&f(x,y,u,v,w)=f_Y(y)f_{X|Y}(x)f_{Z|X,Y}(z)f_{U|X,Y}(u)f_{V|X,Y}(v)f_{W|X,Y}(w)
 \end{aligned}
 $$
 
+Then, we will specify the domain, distribution, and parameters of each
+random variable.
+
+1.  $Y$ represents the country the person is from.
+
+Let $Y$ be a discrete uniform distribution over a finite set of countries
+$\{C_1, C_2, ..., C_N\}$ where $N$ is the total number of countries and:
+$$ P(Y=C_i)=\frac{1}{N}
+$$ $N$ is around 200 and $Y$ is a real number in $(0,1)$.
+
+2.  $X$ represents the person's age and takes value in the set of
+    natural numbers.
+
+$X|Y$ can follow a Beta binomial distribution. Let $n_Y$ be the maximum age of a person which is likely decided by the country. It's usually not over 120.
+Then $$X|Y \sim BetaBin(n_Y, \alpha_Y, \beta_Y)$$ and
+$$P(X=x|Y)= {n\choose x} \frac{B(x+\alpha_Y,n_Y-x+\beta_Y)}{B(\alpha_Y,\beta_Y)}$$
+
+where $\alpha_Y>0, \beta_Y >0$ decide the shape of the distribution of ages of a specific country $Y$. $X|Y$ is a natural number in $[0,n_Y]$.
+
+
+3.  $Z$ represents whether the person attended a picnic the first week
+    of July, 2023. 
+  
+Given it is a binary variable that can take 0 or 1, so $Z|X,Y$ can follow a Bernoulli distribution where $$
+P(Z = z|X,Y) = p_{XY}^z (1-p_{XY})^{1-z} \quad\quad z \in \{0,1\}
+$$ where parameter $p_{XY} \in [0,1]$ is the probability of attending a picnic decided by the person age and country custom.
+
+4.  $U$ represents the amount of coffee the person consumed in 2023. 
+
+We assume $U|X,Y \sim Gamma(\alpha_{XY},\beta_{XY}) \in[0,+\infty)$.The PDF is given by: 
+$$
+f(u;\alpha_{XY},\beta_{XY}) = \frac{\beta_{XY}^{\alpha_{XY}} u^{\alpha_{XY}-1} e^{-\beta_{XY}u} }{\Gamma(\alpha_{XY})}
+$$
+With a shape parameter $\alpha_{XY}>0$ and a scale parameter $\beta_{XY}>0$ decided by the person age and country custom.
+
+5.  $V$ represents the amount of screen time the person spends in each of the 24 hours on September 1, 2023. 
+
+In each of the 24 hours, we assume the screen time (in hour unit) $V_i|X\land Y$ follow a beta distribution $Beta(\alpha_{XY},\beta_{XY})$ ranging from (0,1). For simplicity, we assume the screen time of each hour is independent and follows the beta distribution with the same parameters $\alpha_{XY}>0,\beta_{XY}>0$ once $X$ and $Y$ are given. 
+So $\mathbf{V}|X,Y$ is a vector random variable with the distribution $$
+\begin{aligned}
+    &\mathbf{V}|X\land Y = (V_1|X\land Y, V_2|X\land Y, \ldots, V_{24}|X\land Y) \\
+    &\text{where } V_i|X\land Y \sim Beta(\alpha_{XY}, \beta_{XY}), \quad i.i.d.\\
+\end{aligned}
+    $$ The pdf of the joint distribution of $\mathbf{V}|X\land Y$is 
+    $$f(\mathbf{V}|X \land Y) = \prod_{i=1}^{24} \frac{v_i^{\alpha_{XY} - 1} (1 - v_i)^{\beta_{XY} - 1}}{B(\alpha_{XY}, \beta_{XY})}
+    $$
+
+6. $W$ represents a passport photo of the person.
+
+We assume a photo should be a 2-d image with $m_Y \times n_Y$ pixels, which are decided by the country. Then we assume they both follows Gamma distribution ranging from $[0,+\infty)$: $$
+\begin{aligned}
+m_Y|Y\sim Gamma(\alpha_{mY},\beta_{mY})\\
+n_Y|Y\sim Gamma(\alpha_{nY},\beta_{nY})
+\end{aligned}
+$$ 
+where $\alpha_{mY},\beta_{mY}, \alpha_{nY},\beta_{nY}$ are all greater than 0.
+
+Then for each pixel $w_{ij}$, it has three random variables R,G,B ranging over integer in $[0, 255]$.
+For simplicity, we assume they all follow the same Beta binomial distribution and variables across pixels are also independent once $X$ and $Y$ are given: $$
+\begin{aligned}
+w_{ijR}|X,Y \sim BetaBin(255, \alpha_{XY},\beta_{XY})\\
+w_{ijG}|X,Y \sim BetaBin(255, \alpha_{XY},\beta_{XY})\\
+w_{ijR}|X,Y \sim BetaBin(255, \alpha_{XY},\beta_{XY})
+\end{aligned}
+$$
+where $\alpha_{XY}>0,\beta_{XY}>0$.
 
 ## Problem 4
+
 $$
 \theta \sim \text{Beta}(a,b): p(\theta) =\frac{\Gamma(a+b)}{\Gamma(a) \Gamma(b)} \theta^{a-1}(1-\theta)^{b-1}
-$$
-Therefore
-$$
+$$ Therefore $$
 \text{mode}[\theta] = \max_{\theta} \frac{\Gamma(a+b)}{\Gamma(a) \Gamma(b)} \theta^{a-1}(1-\theta)^{b-1}
-$$
-$$
+$$ $$
 \frac{dp(\theta)}{d\theta} =  \frac{\Gamma(a+b)}{\Gamma(a) \Gamma(b)} \left(   (a-1)\theta^{a-2}(1-\theta)^{b-1} - \theta^{a-1}(b-1)(1-\theta)^{b-2}  \right)
 =0
-$$
-we have
-$$
+$$ we have $$
   (a-1)\theta^{a-2}(1-\theta)^{b-1} - \theta^{a-1}(b-1)(1-\theta)^{b-2} =0 \to \theta = \frac{a-1}{a+b-2}
-$$
-Note that if $a>0, b>0$, $p(\theta=0)=p(\theta=1)=0$, since $p(\theta)\geq 0 \,\forall \theta$ and $p(\theta)$ is continuous, The mode we get above can maximize $p(\theta)$.
+$$ Note that if $a>1, b>1$, $p(\theta=0)=p(\theta=1)=0$, since
+$p(\theta)\geq 0 \,\forall \theta$ and $p(\theta)$ is continuous, so the
+solution we get above can maximize $p(\theta)$.
 
 $$
 \begin{aligned}
@@ -369,53 +277,47 @@ $$
 &=  \frac{\Gamma(a+b)}{\Gamma(a) \Gamma(b)}   \frac{a\Gamma(a)\Gamma{(b)}}{(a+b)\Gamma(a+b)}   \\
 &=\frac{a}{a+b}
 \end{aligned}
-$$
-$$
+$$ $$
 \begin{aligned}
-\mathbb{E}\theta^2 &= \int_0^1 \theta^2 \frac{\Gamma(a+b)}{\Gamma(a) \Gamma(b)} \theta^{a-1}(1-\theta)^{b-1} d\theta \\
+\mathbb{E}(\theta^2) &= \int_0^1 \theta^2 \frac{\Gamma(a+b)}{\Gamma(a) \Gamma(b)} \theta^{a-1}(1-\theta)^{b-1} d\theta \\
 &=  \frac{\Gamma(a+b)}{\Gamma(a) \Gamma(b)} \int_0^1 \theta^{a+2-1}(1-\theta)^{b-1} d\theta \\
 &=  \frac{\Gamma(a+b)}{\Gamma(a) \Gamma(b)}   \frac{\Gamma(a+2)\Gamma{(b)}}{\Gamma(a+b+2)}   \\
 &=\frac{a(a+1)}{(a+b)(a+b+1)}
 \end{aligned}
-$$
-thus
-$$
-\text{Var}[\theta] = \mathbb{E}\theta^2 - (\mathbb{E}\theta)^2 = \frac{a(a+1)}{(a+b)(a+b+1)}-\frac{a^2}{(a+b)^2} = \frac{ab}{(a+b)^2(a+b+1)}
+$$ thus $$
+\text{Var}[\theta] = \mathbb{E}(\theta^2) - (\mathbb{E}(\theta))^2 = \frac{a(a+1)}{(a+b)(a+b+1)}-\frac{a^2}{(a+b)^2} = \frac{ab}{(a+b)^2(a+b+1)}
 $$
 
 ## Problem 5
-The parameter we care about is $\theta$, which means the probability of head of the chosen coin. Our prior is $P(\text{heads}|C_1)=0.6, P(\text{heads}|C_2)=0.4$, since we choose one coin at random,
-$$
+
+Let $\theta$ be the probability of
+head of the chosen coin. Since we choose one
+coin at random, $$
 P(\theta=0.6)=P(\theta=0.4)=\frac{1}{2}
-$$
-Use $T_1,T_2$ to represent the first two spins are tails. This event is data and
-$$
-T_i|\theta \sim \text{Bern}(\theta), \text{i.i.d}
+$$ Let $T_i$ to represent the event that the $i_{th}$ spin is tail. Then we have $$
+T_i|\theta \sim \text{Bernoulli}(\theta), \text{i.i.d}
 $$
 
-Posterior of $\theta$ is
-$$
-p(\theta|T_1T_2) =  \frac{p(T_1T_2|\theta)p(\theta)}{p(T_1T_2)}
-$$
-we have
-$$
-P(\theta=0.6|T_1T_2)=\frac{4}{13}, \quad P(\theta=0.4|T_1T_2)=\frac{9}{13}
-$$
-
-Let $Y$ denote the number of additional spins till a head show up, it follows Geometric distribution.
-$$
-Y|\theta \sim \text{Geom}(\theta)
-$$
-$$
-\mathbb{E}\left( \left.Y \right|\theta \right) = \frac{1}{\theta}
-$$
-Therefore
-$$
+Posterior of $\theta$ is $$
+p(\theta|T_1, T_2) =  \frac{p(T_1, T_2|\theta)p(\theta)}{p(T_1, T_2)}
+$$ we have $$
 \begin{aligned}
-\mathbb{E}(Y|T_1T_2) &= \mathbb{E}(\mathbb{E}(Y|\theta,T_1T_2)|T_1T_2)  \quad\text{(Law of total expectation)}\\
-&=\mathbb{E}(\mathbb{E}(Y|\theta)|T_1T_2)\\
-&=\sum_\theta P(\theta|T_1T_2)\cdot \mathbb{E}\left( Y|\theta \right)\\
-&=P(\theta=0.6|T_1T_2)\cdot\frac{1}{0.6} + P(\theta=0.4|T_1T_2)\cdot\frac{1}{0.4}\\
+P(\theta=0.6|T_1, T_2)&=\frac{(1-0.6)*(1-0.6)*1/2}{0.6*0.6*1/2+0.4*0.4*1/2}=\frac{4}{13}, 
+\\P(\theta=0.4|T_1, T_2)&=1-P(\theta=0.4|T_1, T_2)=\frac{9}{13}
+\end{aligned}
+$$
+
+Let $Y$ denote the number of additional spins till a head show up, it
+follows Geometric distribution. $$
+Y|\theta \sim \text{Geom}(\theta)
+$$ $$
+\mathbb{E}\left( \left.Y \right|\theta \right) = \frac{1}{\theta}
+$$ Therefore $$
+\begin{aligned}
+\mathbb{E}(Y|T_1, T_2)
+&=\mathbb{E}(\mathbb{E}(Y|\theta)|T_1, T_2)\\
+&=\Sigma_{\theta} P(\theta|T_1, T_2)\cdot \mathbb{E}\left( \left.Y \right|T_1, T_2,\theta \right)\\
+&=P(\theta=0.6|T_1, T_2)\cdot\frac{1}{0.6} + P(\theta=0.4|T_1, T_2)\cdot\frac{1}{0.4}\\
 &=\frac{4}{13}\cdot\frac{1}{0.6}+\frac{9}{13}\cdot \frac{1}{0.4}\\
 &=\frac{175}{78}\\
 &\approx 2.2436
