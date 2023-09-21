@@ -1,4 +1,4 @@
-This is pdfTeX, Version 3.141592653-2.6-1.40.23 (TeX Live 2021/W32TeX) (preloaded format=pdflatex 2022.3.21)  20 SEP 2023 23:15
+This is pdfTeX, Version 3.141592653-2.6-1.40.23 (TeX Live 2021/W32TeX) (preloaded format=pdflatex 2022.3.21)  21 SEP 2023 16:33
 entering extended mode
  restricted \write18 enabled.
  %&-line parsing enabled.
@@ -502,40 +502,40 @@ File: umsb.fd 2013/01/14 v3.01 AMS symbols B
 File: mt-msb.cfg 2005/06/01 v1.0 microtype config. file: AMS symbols (b) (RS)
 )
 LaTeX Font Info:    External font `lmex10' loaded for size
-(Font)              <12> on input line 126.
+(Font)              <12> on input line 130.
 LaTeX Font Info:    External font `lmex10' loaded for size
-(Font)              <8> on input line 126.
+(Font)              <8> on input line 130.
 LaTeX Font Info:    External font `lmex10' loaded for size
-(Font)              <6> on input line 126.
+(Font)              <6> on input line 130.
 [1
 
 {c:/texlive/2021/texmf-var/fonts/map/pdftex/updmap/pdftex.map}]
-LaTeX Font Info:    Trying to load font information for T1+lmtt on input line 1
-99.
+LaTeX Font Info:    Trying to load font information for T1+lmtt on input line 2
+03.
 (c:/texlive/2021/texmf-dist/tex/latex/lm/t1lmtt.fd
 File: t1lmtt.fd 2015/05/01 v1.6.1 Font defs for Latin Modern
 )
 LaTeX Font Info:    Font shape `T1/lmtt/bx/n' in size <12> not available
-(Font)              Font shape `T1/lmtt/b/n' tried instead on input line 200.
-[2]
+(Font)              Font shape `T1/lmtt/b/n' tried instead on input line 204.
+[2] [3]
 LaTeX Font Info:    Trying to load font information for TS1+lmtt on input line 
-284.
+288.
 (c:/texlive/2021/texmf-dist/tex/latex/lm/ts1lmtt.fd
 File: ts1lmtt.fd 2015/05/01 v1.6.1 Font defs for Latin Modern
-) [3]
-<hw1_files/figure-latex/p3-1.pdf, id=41, 361.35pt x 361.35pt>
+)
+<hw1_files/figure-latex/p3-1.pdf, id=38, 361.35pt x 361.35pt>
 File: hw1_files/figure-latex/p3-1.pdf Graphic file (type pdf)
 <use hw1_files/figure-latex/p3-1.pdf>
-Package pdftex.def Info: hw1_files/figure-latex/p3-1.pdf  used on input line 30
-8.
+Package pdftex.def Info: hw1_files/figure-latex/p3-1.pdf  used on input line 31
+2.
 (pdftex.def)             Requested size: 361.34912pt x 361.34912pt.
-[4 <./hw1_files/figure-latex/p3-1.pdf>]
+[4]
 
 Package amsmath Warning: Foreign command \atopwithdelims;
 (amsmath)                \frac or \genfrac should be used instead
-(amsmath)                 on input line 344.
+(amsmath)                 on input line 348.
 
-[5] [6] [7] [8] (./hw1.aux) ) 
+[5 <./hw1_files/figure-latex/p3-1.pdf>] [6] [7] [8] (./hw1.aux) ) 
 Here is how much of TeX's memory you used:
  14296 strings out of 478276
  225076 string characters out of 5850489
@@ -543,24 +543,25 @@ Here is how much of TeX's memory you used:
  32147 multiletter control sequences out of 15000+600000
  529946 words of font info for 123 fonts, out of 8000000 for 9000
  1141 hyphenation exceptions out of 8191
- 74i,9n,77p,1000b,477s stack positions out of 5000i,500n,10000p,200000b,80000s
-{c:/texlive/2021/texmf-dist/fonts/enc/dvips/lm/lm-
-rm.enc}{c:/texlive/2021/texmf-dist/fonts/enc/dvips/lm/lm-mathit.enc}{c:/texlive
-/2021/texmf-dist/fonts/enc/dvips/lm/lm-mathex.enc}{c:/texlive/2021/texmf-dist/f
-onts/enc/dvips/lm/lm-mathsy.enc}{c:/texlive/2021/texmf-dist/fonts/enc/dvips/lm/
-lm-ts1.enc}{c:/texlive/2021/texmf-dist/fonts/enc/dvips/lm/lm-ec.enc}<c:/texlive
-/2021/texmf-dist/fonts/type1/public/lm/lmbx12.pfb><c:/texlive/2021/texmf-dist/f
-onts/type1/public/lm/lmex10.pfb><c:/texlive/2021/texmf-dist/fonts/type1/public/
-lm/lmmi12.pfb><c:/texlive/2021/texmf-dist/fonts/type1/public/lm/lmmi6.pfb><c:/t
-exlive/2021/texmf-dist/fonts/type1/public/lm/lmmi8.pfb><c:/texlive/2021/texmf-d
-ist/fonts/type1/public/lm/lmr12.pfb><c:/texlive/2021/texmf-dist/fonts/type1/pub
-lic/lm/lmr17.pfb><c:/texlive/2021/texmf-dist/fonts/type1/public/lm/lmr8.pfb><c:
-/texlive/2021/texmf-dist/fonts/type1/public/lm/lmsy10.pfb><c:/texlive/2021/texm
-f-dist/fonts/type1/public/lm/lmsy8.pfb><c:/texlive/2021/texmf-dist/fonts/type1/
-public/lm/lmtk10.pfb><c:/texlive/2021/texmf-dist/fonts/type1/public/lm/lmtt12.p
-fb><c:/texlive/2021/texmf-dist/fonts/type1/public/lm/lmtti10.pfb><c:/texlive/20
-21/texmf-dist/fonts/type1/public/amsfonts/symbols/msbm10.pfb>
-Output written on hw1.pdf (8 pages, 244063 bytes).
+ 74i,9n,77p,1000b,428s stack positions out of 5000i,500n,10000p,200000b,80000s
+{c:/texlive/20
+21/texmf-dist/fonts/enc/dvips/lm/lm-rm.enc}{c:/texlive/2021/texmf-dist/fonts/en
+c/dvips/lm/lm-mathit.enc}{c:/texlive/2021/texmf-dist/fonts/enc/dvips/lm/lm-math
+ex.enc}{c:/texlive/2021/texmf-dist/fonts/enc/dvips/lm/lm-mathsy.enc}{c:/texlive
+/2021/texmf-dist/fonts/enc/dvips/lm/lm-ts1.enc}{c:/texlive/2021/texmf-dist/font
+s/enc/dvips/lm/lm-ec.enc}<c:/texlive/2021/texmf-dist/fonts/type1/public/lm/lmbx
+12.pfb><c:/texlive/2021/texmf-dist/fonts/type1/public/lm/lmex10.pfb><c:/texlive
+/2021/texmf-dist/fonts/type1/public/lm/lmmi12.pfb><c:/texlive/2021/texmf-dist/f
+onts/type1/public/lm/lmmi6.pfb><c:/texlive/2021/texmf-dist/fonts/type1/public/l
+m/lmmi8.pfb><c:/texlive/2021/texmf-dist/fonts/type1/public/lm/lmr12.pfb><c:/tex
+live/2021/texmf-dist/fonts/type1/public/lm/lmr17.pfb><c:/texlive/2021/texmf-dis
+t/fonts/type1/public/lm/lmr8.pfb><c:/texlive/2021/texmf-dist/fonts/type1/public
+/lm/lmsy10.pfb><c:/texlive/2021/texmf-dist/fonts/type1/public/lm/lmsy8.pfb><c:/
+texlive/2021/texmf-dist/fonts/type1/public/lm/lmtk10.pfb><c:/texlive/2021/texmf
+-dist/fonts/type1/public/lm/lmtt12.pfb><c:/texlive/2021/texmf-dist/fonts/type1/
+public/lm/lmtti10.pfb><c:/texlive/2021/texmf-dist/fonts/type1/public/amsfonts/s
+ymbols/msbm10.pfb>
+Output written on hw1.pdf (8 pages, 244844 bytes).
 PDF statistics:
  180 PDF objects out of 1000 (max. 8388607)
  135 compressed objects within 2 object streams
