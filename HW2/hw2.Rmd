@@ -50,25 +50,25 @@ Posterior
 $$
 \begin{aligned}
 &\theta_A|\mathbf{y}_A, \mathbf{y}_B \sim  \operatorname{gamma}(120+10\bar{y}_A,10+10)=\operatorname{gamma}(237, 20) \\
-&\theta_B|\mathbf{y}_A, \mathbf{y}_B \sim  \operatorname{gamma}(12+13\bar{y}_B,1+13)=\operatorname{gamma}(195, 14) \\
+&\theta_B|\mathbf{y}_A, \mathbf{y}_B \sim  \operatorname{gamma}(12+13\bar{y}_B,1+13)=\operatorname{gamma}(125, 14) \\
 \end{aligned}
 $$
 ```{r p2a}
 ya <- c(12,9,12,14,13,13,15,8,15,6)
-yb <- c(11,11,10,9,9,87,10,6,8,8,9,7)
+yb <- c(11,11,10,9,9,8,7,10,6,8,8,9,7)
 sum(ya)
 sum(yb)
 ```
 
 Posterior mean
 $$
-E(\theta_A|\mathbf{y}_A, \mathbf{y}_B) = \frac{237}{20}=11.85, \quad E(\theta_B|\mathbf{y}_A, \mathbf{y}_B) = \frac{195}{14}=13.929
+E(\theta_A|\mathbf{y}_A, \mathbf{y}_B) = \frac{237}{20}=11.85, \quad E(\theta_B|\mathbf{y}_A, \mathbf{y}_B) = \frac{125}{14}=8.929
 $$
 
 Posterior variance
 $$
 Var(\theta_A|\mathbf{y}_A, \mathbf{y}_B) = \frac{237}{400},\quad
-Var(\theta_B|\mathbf{y}_A, \mathbf{y}_B) = \frac{195}{196}
+Var(\theta_B|\mathbf{y}_A, \mathbf{y}_B) = \frac{125}{196}
 $$
 
 Posterior confidence interval
@@ -77,33 +77,34 @@ Posterior confidence interval
 cat("theta_A: ", qgamma(c(.025, .975), 237, 20), "\n")
 
 #theta_B
-cat("theta_B: ", qgamma(c(.025, .975), 195, 14))
+cat("theta_B: ", qgamma(c(.025, .975), 125, 14))
 ```
 
 ### (b)
 Posterior
 $$
-\theta_B|\mathbf{y}_A, \mathbf{y}_B \sim  \operatorname{gamma}(12n_0+13\bar{y}_B,n_0+13)=\operatorname{gamma}(12n_0+185, 13+n_0) \\
-
+\theta_B|\mathbf{y}_A, \mathbf{y}_B \sim  \operatorname{gamma}(12n_0+13\bar{y}_B,n_0+13)=\operatorname{gamma}(12n_0+113, 13+n_0)
 $$
 ```{r}
 #posterior expectation is (12n_0+185)/(13+n_0)
-(12*1:50+185)/(13+1:50)
+(12*1:50+113)/(13+1:50)
 ```
 
-For arbitrary gamma prior, $\theta_B \sim \operatorname{gamma}(\alpha,\beta)$,
+For arbitrary gamma prior, 
+$\theta_B \sim \operatorname{gamma}(\alpha,\beta)$,
 to make the posterior expectation of $\theta_B$ to be close to that of $\theta_A$, just make them equal and solve
 $$
-\frac{\alpha+185}{\beta+13}=\frac{237}{20}
+\frac{\alpha+113}{\beta+13}=\frac{237}{20}
 $$
 we get
 $$
-\beta = -30.95 + 7.9\alpha,\quad \alpha,\beta>0
+\alpha = 41.05 + 11.83\alpha,\quad \alpha,\beta>0
 $$
-Therefore, if the parameter of $\theta_B$'s prior locate at the line $\beta=-30.95+7.9\alpha$, we can get exactly the same posterior expectation. To get a close result, you can add small perturbation to this line.
+Therefore, if the parameters of $\theta_B$'s prior locate at the line $\alpha=41.05+11.83\beta$, we can get exactly the same posterior expectation. To get a close result, you can add small perturbation to this line.
 
 ### (c)
-No. Since the prior $p(\theta_A,\theta_B) = p(\theta_A)\times p(\theta_B)$ implies the independence between type A and type B. In other words
+No. Since the prior 
+$p(\theta_A,\theta_B) = p(\theta_A)\times p(\theta_B)$ implies the independence between type A and type B. In other words
 $$
 p(\theta_{B}|\mathbf{y}_A, \mathbf{y}_B) = p(\theta_{B}|\mathbf{y}_B)
 $$
@@ -125,42 +126,173 @@ p(\theta_{A},\theta_{B}|\mathbf{y}_A, \mathbf{y}_B)
 \end{aligned}
 $$
 The second line is because in the sampling model we assume type A or B is only influenced by its own parameter.     
-We integrate over $\theta_A$
+We integrate over $\theta_A$,
+
 $$
 p(\theta_{B}|\mathbf{y}_A, \mathbf{y}_B) =C\cdot p(\theta_B|\mathbf{y}_B)
 $$
 Note that both sides are pdf of $\theta_B$, so if we integrate over $\theta_B$ again, we must have $C=1$, i.e. 
+
 $$
 p(\theta_{B}|\mathbf{y}_A, \mathbf{y}_B) = p(\theta_B|\mathbf{y}_B)
 $$
 
-It doesn't make sense to have $p(\theta_A, \theta_B) = p(\theta_A)p(\theta_B) $ because it's known that type B mice are related to type A mice. The previous prior implies there's no connection between type A and B.
+It doesn't make sense to have 
+$p(\theta_A, \theta_B) = p(\theta_A)p(\theta_B)$ because it's known that type B mice are related to type A mice. The previous prior implies there's no connection between type A and B.
 
 ### (d)
+The test quantity is
 
+$$
+T(y,\theta) = \frac{\bar{\mathbf{y}}_A}{sd(\bar{\mathbf{y}}_A)}
+$$
 
+We need to calculate this value in the replicated data.
+```{r} 
+#set.seed(2304933)
+S <- 10000
 
+post_test <- function(a,b,n){
+  #sample posterior theta
+  theta_p <- rgamma(S,a,b)
+  
+  #sample posterior y, one row is one replicated data
+  y_p <- matrix(rpois(n*S, rep(theta_p, n)), ncol=n)
+  
+  #calculate posterior test quantity
+  test_p <- rowMeans(y_p)/apply(y_p, 1, sd)
+  
+  return (test_p)
+}
 
+test_p <- post_test(237, 20, 10)
 
+#observed test quantity
+test_obs <- mean(ya)/sd(ya)
+#calculate bayesian p-value
+hat_p_value <- mean(test_p>=test_obs)
+print(hat_p_value)
 
+hist(test_p, breaks=seq(0, 15), cex=1, xlim=c(0,15))
+axis(side = 1, at = seq(0,15))
+abline(v=test_obs, col='red', lwd=3)
+```
 
+From the Bayesian p-value (0.4045, not extreme) and the distribution of test quantity, we conclude that using Poisson sampling model is appropriate and adequate.
 
+### (e)
+Similarly
+```{r}
+test_p <- post_test(125, 14, 13)
 
+#observed test quantity
+test_obs <- mean(yb)/sd(yb)
+#calculate bayesian p-value
+hat_p_value <- mean(test_p>=test_obs)
+print(hat_p_value)
 
+hist(test_p, breaks=seq(0, 15), cex=1, xlim=c(0,15))
+axis(side = 1, at = seq(0,15))
+abline(v=test_obs, col='red', lwd=3)
 
+```
 
+Note that the Bayesian p-value is extreme (0.0074), which shows that the Poisson sampling model and the prior of type B is not adequate.
 
+## Problem 3
+### (a)
+Prior
+$$
+\theta \sim \Gamma(\alpha,\beta) \propto \theta^{\alpha-1}e^{-\beta \theta}
+$$
+Likelihood
+$$
+\begin{aligned}
+&y_i|\theta \sim  \mathcal{E}(\theta) \propto \theta e^{-\theta y_i }, y_i\,\, \text{i.i.d.}\\
+\rightarrow\,\,&p(\vec{y}|\theta) \propto \prod_i \theta e^{-\theta y_i } = \theta^ne^{-\theta\sum_i y_i} = \theta^ne^{-\theta\cdot n \bar{y}}
+\end{aligned}
+$$
+Posterior
+$$
+\begin{aligned}
+p(\theta|\vec{y}) &\propto p(\vec{y}|\theta)p(\theta) \propto \theta^ne^{-\theta\cdot n \bar{y}}\theta^{\alpha-1}e^{-\beta \theta} \propto \theta^{\alpha+n-1} e^{-(\beta+n\bar{y})\theta} \\
+& \sim \Gamma(\alpha+n, \beta+n\bar{y})
+\end{aligned}
+$$
 
+Since the posterior distribution of $\theta$ is still gamma distribution, which is in the same probability distribution family as the prior $p(\theta)$, by definition, the gamma prior distribution is conjugate for exponential distribution likelihood.
 
+### (b)
+For $\Gamma(\alpha,\beta)$, the coefficient of variation is
+$$
+\frac{\sqrt{\alpha/\beta^2}}{\alpha/\beta} = \frac{1}{\sqrt{\alpha}}
+$$
+It's known that this value is 0.5, so for the prior distribution
+$$
+\frac{1}{\sqrt{\alpha}}=0.5 \to \alpha=4
+$$
+In the posterior distribution of $\theta$, the coefficient of variation is
+$$
+\frac{\sqrt{\alpha+n/(\beta++n\bar{y})^2}}{\alpha+n/(\beta+n\bar{y})} = \frac{1}{\sqrt{\alpha+n}} = 0.1
+$$
+Therefore
+$$
+n=96
+$$
+So, 96 light bulbs need to be tested.
 
+### (c)
+We need to consider the prior and posterior distribution of $\phi=1/\theta$. Since the prior of $\theta$ is $\Gamma(\alpha,\beta)$, the prior of $\phi$ should be
+$$
+\phi \sim \text{Inv-}\Gamma(\alpha,\beta)
+$$
+the coefficient of variation is
+$$
+\frac{\sqrt{\beta^2/((\alpha-1)^2(\alpha-2))}}{\beta/(\alpha-1)} = 0.5 \to \alpha=6
+$$
+Similarly, the posterior of $\phi$ should be
+$$
+\phi|\vec{y} \sim \text{Inv-}\Gamma(\alpha+n, \beta+n\bar{y})
+$$
+so
+$$
+\frac{\sqrt{(\beta+n\bar{y})^2/((\alpha+n-1)^2(\alpha+n-2))}}{(\beta+n\bar{y})/(\alpha+n-1)} = 0.1 \to n=96
+$$
 
+The answer doesn't change.
 
+### (d)
+Prior
+$$
+\theta \sim \Gamma(\alpha,\beta) \propto \theta^{\alpha-1}e^{-\beta \theta}
+$$
+Data
+$$
+y|\theta \sim  \mathcal{E}(\theta), y\geq100, \text{ and no exact value}
+$$
+Since we don't know the exact value of $y$, so now the condition of posterior becomes $y\geq100$,i.e.
+$$
+\begin{aligned}
+p(\theta|y\geq 100) &\propto p(y\geq 100|\theta)p(\theta)
+\propto \left(\int_{100}^{+\infty} \theta e^{-\theta y } dy\right) \cdot \theta^{\alpha-1}e^{-\beta \theta}\\
+&\propto e^{-100\theta} \theta^{\alpha-1}e^{-\beta \theta} \\
+&\propto \theta^{\alpha-1} e^{-(\beta+100) \theta} \\
+&\sim \Gamma(\alpha, \beta+100)
+\end{aligned}
+$$
+Therefore, posterior mean and variance is
+$$
+E(\theta|y\geq 100)=\frac{\alpha}{\beta+100}, \quad Var(\theta|y\geq 100) = \frac{\alpha}{(\beta+100)^2}
+$$
 
+### (e)
+By part (a), when $y=100$, posterior distribution of $\theta$ is
+$$
+\theta|y \sim \Gamma(\alpha+1, \beta+100)
+$$
+Posterior mean and variance is
+$$
+E(\theta|y) = \frac{\alpha+1}{\beta+100}, \quad Var(\theta|y) = \frac{\alpha+1}{(\beta+100)^2}
+$$
 
-
-
-
-
-
-
-
+We find that this posterior variance is higher than that in part (d).
