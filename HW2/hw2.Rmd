@@ -1,0 +1,560 @@
+---
+title: "STATS551 Homework2"
+author: "Junjie Xu, Minxuan Chen"
+date: "2023-10-09"
+output:
+  pdf_document: default
+  html_document:
+    df_print: paged
+editor_options: 
+  markdown: 
+    wrap: 72
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(
+	echo = TRUE,
+	message = TRUE,
+	warning = TRUE
+)
+```
+
+We contribute to each of the problem equally by finishing them
+individually and having a discussion to agree on the answers. And we
+improved our solution to Problem 3 together during the discussion.
+
+```{r}
+library(tinytex)
+```
+
+## Question1 (Junjie Xu)
+
+### Bayesian Coverage:
+
+**Scenario:**
+
+We employ Bayesian methodology, incorporating information about age (X),
+community engagement (Z), and screen time (V), to construct a credible
+interval for the influence of coffee consumption on residents from
+different countries.
+
+**Explanation:**
+
+In Bayesian coverage, considering all available information, including
+age, community engagement, and screen time, we build a probability
+distribution for the impact of coffee consumption. From this, we derive
+a credible interval. This interval signifies the uncertainty surrounding
+the influence of coffee consumption on specific demographic groups
+within the different countries considered. Decision-makers can utilize
+this interval to comprehend the variability in coffee consumption impact
+across different national groups and develop corresponding strategies.
+
+### Frequentist Coverage:
+
+**Scenario:**
+
+We employ Frequentist methodology, based on observed data (age X,
+community engagement Z, coffee consumption U, screen time V), to
+construct a confidence interval for the average coffee consumption among
+residents from different countries.
+
+**Explanation:**
+
+In Frequentist coverage, relying on sample data (i.e., observed age,
+community engagement, coffee consumption, and screen time), we estimate
+the average coffee consumption within various national groups. We
+construct a confidence interval, providing an estimate of the average
+coffee consumption for residents in different countries while accounting
+for the uncertainty in the estimation. Decision-makers can utilize this
+interval to compare coffee consumption patterns across different
+countries, gaining insights into these estimates' reliability.
+
+## Problem 2 (Minxuan Chen)
+
+### (a)
+
+Prior $$
+\theta_A \sim \operatorname{gamma}(120,10), \theta_B \sim \operatorname{gamma}(12,1), p\left(\theta_A, \theta_B\right)=p\left(\theta_A\right) \times p\left(\theta_B\right)
+$$ Likelihood $$
+\begin{aligned}
+&y_A|\theta_A \sim \mathcal{P}(\theta_A), y_A \,\,\text{i.i.d.} \\
+&y_B|\theta_B \sim \mathcal{P}(\theta_B), y_B \,\,\text{i.i.d.} \\
+&y_A\perp\!\!\!\!\perp y_B
+\end{aligned}
+$$ Posterior $$
+\begin{aligned}
+&\theta_A|\mathbf{y}_A, \mathbf{y}_B \sim  \operatorname{gamma}(120+10\bar{y}_A,10+10)=\operatorname{gamma}(237, 20) \\
+&\theta_B|\mathbf{y}_A, \mathbf{y}_B \sim  \operatorname{gamma}(12+13\bar{y}_B,1+13)=\operatorname{gamma}(125, 14) \\
+\end{aligned}
+$$
+
+```{r p2a}
+ya <- c(12,9,12,14,13,13,15,8,15,6)
+yb <- c(11,11,10,9,9,8,7,10,6,8,8,9,7)
+sum(ya)
+sum(yb)
+```
+
+Posterior mean $$
+E(\theta_A|\mathbf{y}_A, \mathbf{y}_B) = \frac{237}{20}=11.85, \quad E(\theta_B|\mathbf{y}_A, \mathbf{y}_B) = \frac{125}{14}=8.929
+$$
+
+Posterior variance $$
+Var(\theta_A|\mathbf{y}_A, \mathbf{y}_B) = \frac{237}{400},\quad
+Var(\theta_B|\mathbf{y}_A, \mathbf{y}_B) = \frac{125}{196}
+$$
+
+Posterior confidence interval
+
+```{r}
+#theta_A
+cat("theta_A: ", qgamma(c(.025, .975), 237, 20), "\n")
+
+#theta_B
+cat("theta_B: ", qgamma(c(.025, .975), 125, 14))
+```
+
+### (b)
+
+Posterior $$
+\theta_B|\mathbf{y}_A, \mathbf{y}_B \sim  \operatorname{gamma}(12n_0+13\bar{y}_B,n_0+13)=\operatorname{gamma}(12n_0+113, 13+n_0)
+$$
+
+```{r}
+#posterior expectation is (12n_0+185)/(13+n_0)
+pos_mean <- (12*1:50+113)/(13+1:50)
+print(pos_mean)
+plot(pos_mean, main="Posterior expectation of theta_B")
+```
+
+
+
+
+
+For arbitrary gamma prior,
+$\theta_B \sim \operatorname{gamma}(\alpha,\beta)$, to make the
+posterior expectation of $\theta_B$ to be close to that of $\theta_A$,
+just make them equal and solve $$
+\frac{\alpha+113}{\beta+13}=\frac{237}{20}
+$$ we get $$
+\alpha = 41.05 + 11.83\alpha,\quad \alpha,\beta>0
+$$ Therefore, if the parameters of $\theta_B$'s prior locate at the line
+$\alpha=41.05+11.83\beta$, we can get exactly the same posterior
+expectation. To get a close result, you can add small perturbation to
+this line.
+
+### (c)
+
+No. Since the prior
+$p(\theta_A,\theta_B) = p(\theta_A)\times p(\theta_B)$ implies the
+independence between type A and type B. In other words $$
+p(\theta_{B}|\mathbf{y}_A, \mathbf{y}_B) = p(\theta_{B}|\mathbf{y}_B)
+$$ We can prove it.\
+*Proof* $$
+\begin{aligned}
+p(\theta_{A},\theta_{B}|\mathbf{y}_A, \mathbf{y}_B) 
+\propto p(\mathbf{y}_A, \mathbf{y}_B|\theta_{A},\theta_{B})p(\theta_{A},\theta_{B})
+\end{aligned}
+$$ Note that type A and type B are independent given $\theta_A,\theta_B$
+(due to different type, i.e. two populations), so $$
+\begin{aligned}
+p(\theta_{A},\theta_{B}|\mathbf{y}_A, \mathbf{y}_B) 
+&\propto p(\mathbf{y}_A|\theta_{A},\theta_{B})p(\mathbf{y}_B|\theta_{A},\theta_{B}) p(\theta_{A})p(\theta_{B})\\
+&\propto p(\mathbf{y}_A|\theta_{A})p(\theta_A)\cdot p(\mathbf{y}_B|\theta_{B})p(\theta_B)\\
+&\propto p(\theta_A|\mathbf{y}_A) p(\theta_B|\mathbf{y}_B)
+\end{aligned}
+$$ The second line is because in the sampling model we assume type A or
+B is only influenced by its own parameter.\
+We integrate over $\theta_A$,
+
+$$
+p(\theta_{B}|\mathbf{y}_A, \mathbf{y}_B) =C\cdot p(\theta_B|\mathbf{y}_B)
+$$ Note that both sides are pdf of $\theta_B$, so if we integrate over
+$\theta_B$ again, we must have $C=1$, i.e.
+
+$$
+p(\theta_{B}|\mathbf{y}_A, \mathbf{y}_B) = p(\theta_B|\mathbf{y}_B)
+$$
+
+It doesn't make sense to have
+$p(\theta_A, \theta_B) = p(\theta_A)p(\theta_B)$ because it's known that
+type B mice are related to type A mice. The previous prior implies
+there's no connection between type A and B.
+
+### (d)
+
+The test quantity is
+
+$$
+T(y,\theta) = \frac{\bar{\mathbf{y}}_A}{sd(\bar{\mathbf{y}}_A)}
+$$
+
+We need to calculate this value in the replicated data.
+
+```{r}
+set.seed(2304933)
+S <- 10000
+
+post_test <- function(a,b,n){
+  #sample posterior theta
+  theta_p <- rgamma(S,a,b)
+  
+  #sample posterior y, one row is one replicated data
+  y_p <- matrix(rpois(n*S, rep(theta_p, n)), ncol=n)
+  
+  #calculate posterior test quantity
+  test_p <- rowMeans(y_p)/apply(y_p, 1, sd)
+  
+  return (test_p)
+}
+
+test_p <- post_test(237, 20, 10)
+
+#observed test quantity
+test_obs <- mean(ya)/sd(ya)
+#calculate bayesian p-value
+hat_p_value <- mean(test_p>=test_obs)
+print(hat_p_value)
+
+hist(test_p, breaks=seq(0, 15), cex=1, xlim=c(0,15))
+axis(side = 1, at = seq(0,15))
+abline(v=test_obs, col='red', lwd=3)
+```
+
+From the Bayesian p-value (0.4045, not extreme) and the distribution of
+test quantity, we conclude that using Poisson sampling model is
+appropriate and adequate.
+
+### (e)
+
+Similarly
+
+```{r}
+test_p <- post_test(125, 14, 13)
+
+#observed test quantity
+test_obs <- mean(yb)/sd(yb)
+#calculate bayesian p-value
+hat_p_value <- mean(test_p>=test_obs)
+print(hat_p_value)
+
+hist(test_p, breaks=seq(0, 15), cex=1, xlim=c(0,15))
+axis(side = 1, at = seq(0,15))
+abline(v=test_obs, col='red', lwd=3)
+
+```
+
+Note that the Bayesian p-value is extreme (0.0074), which shows that the
+Poisson sampling model and the prior of type B is not adequate.
+
+## Problem 3 (Minxuan Chen)
+
+### (a)
+
+Prior $$
+\theta \sim \Gamma(\alpha,\beta) \propto \theta^{\alpha-1}e^{-\beta \theta}
+$$ Likelihood $$
+\begin{aligned}
+&y_i|\theta \sim  \mathcal{E}(\theta) \propto \theta e^{-\theta y_i }, y_i\,\, \text{i.i.d.}\\
+\rightarrow\,\,&p(\vec{y}|\theta) \propto \prod_i \theta e^{-\theta y_i } = \theta^ne^{-\theta\sum_i y_i} = \theta^ne^{-\theta\cdot n \bar{y}}
+\end{aligned}
+$$ Posterior $$
+\begin{aligned}
+p(\theta|\vec{y}) &\propto p(\vec{y}|\theta)p(\theta) \propto \theta^ne^{-\theta\cdot n \bar{y}}\theta^{\alpha-1}e^{-\beta \theta} \propto \theta^{\alpha+n-1} e^{-(\beta+n\bar{y})\theta} \\
+& \sim \Gamma(\alpha+n, \beta+n\bar{y})
+\end{aligned}
+$$
+
+Since the posterior distribution of $\theta$ is still gamma
+distribution, which is in the same probability distribution family as
+the prior $p(\theta)$, by definition, the gamma prior distribution is
+conjugate for exponential distribution likelihood.
+
+### (b)
+
+For $\Gamma(\alpha,\beta)$, the coefficient of variation is $$
+\frac{\sqrt{\alpha/\beta^2}}{\alpha/\beta} = \frac{1}{\sqrt{\alpha}}
+$$ It's known that this value is 0.5, so for the prior distribution $$
+\frac{1}{\sqrt{\alpha}}=0.5 \to \alpha=4
+$$ In the posterior distribution of $\theta$, the coefficient of
+variation is $$
+\frac{\sqrt{\alpha+n/(\beta++n\bar{y})^2}}{\alpha+n/(\beta+n\bar{y})} = \frac{1}{\sqrt{\alpha+n}} = 0.1
+$$ Therefore $$
+n=96
+$$ So, 96 light bulbs need to be tested.
+
+### (c)
+
+We need to consider the prior and posterior distribution of
+$\phi=1/\theta$. Since the prior of $\theta$ is $\Gamma(\alpha,\beta)$,
+the prior of $\phi$ should be $$
+\phi \sim \text{Inv-}\Gamma(\alpha,\beta)
+$$ the coefficient of variation is $$
+\frac{\sqrt{\beta^2/((\alpha-1)^2(\alpha-2))}}{\beta/(\alpha-1)} = 0.5 \to \alpha=6
+$$ Similarly, the posterior of $\phi$ should be $$
+\phi|\vec{y} \sim \text{Inv-}\Gamma(\alpha+n, \beta+n\bar{y})
+$$ so $$
+\frac{\sqrt{(\beta+n\bar{y})^2/((\alpha+n-1)^2(\alpha+n-2))}}{(\beta+n\bar{y})/(\alpha+n-1)} = 0.1 \to n=96
+$$
+
+The answer doesn't change.
+
+### (d)
+
+Prior $$
+\theta \sim \Gamma(\alpha,\beta) \propto \theta^{\alpha-1}e^{-\beta \theta}
+$$ Data $$
+y|\theta \sim  \mathcal{E}(\theta), y\geq100, \text{ and no exact value}
+$$ Since we don't know the exact value of $y$, so now the condition of
+posterior becomes $y\geq100$,i.e. $$
+\begin{aligned}
+p(\theta|y\geq 100) &\propto p(y\geq 100|\theta)p(\theta)
+\propto \left(\int_{100}^{+\infty} \theta e^{-\theta y } dy\right) \cdot \theta^{\alpha-1}e^{-\beta \theta}\\
+&\propto e^{-100\theta} \theta^{\alpha-1}e^{-\beta \theta} \\
+&\propto \theta^{\alpha-1} e^{-(\beta+100) \theta} \\
+&\sim \Gamma(\alpha, \beta+100)
+\end{aligned}
+$$ Therefore, posterior mean and variance is $$
+E(\theta|y\geq 100)=\frac{\alpha}{\beta+100}, \quad Var(\theta|y\geq 100) = \frac{\alpha}{(\beta+100)^2}
+$$
+
+### (e)
+
+By part (a), when $y=100$, posterior distribution of $\theta$ is $$
+\theta|y=100 \sim \Gamma(\alpha+1, \beta+100)
+$$ Posterior mean and variance is $$
+E(\theta|y=100) = \frac{\alpha+1}{\beta+100}, \quad Var(\theta|y=100) = \frac{\alpha+1}{(\beta+100)^2}
+$$
+
+We find that this posterior variance is higher than that in part (d).
+
+As for the reason, by the law of total variance $$
+Var(\theta) = Var(E(\theta|Y)) + E(Var(\theta|Y))
+$$ thus $$
+Var(\theta) \geq Var(E(\theta|Y)), Var(\theta) \geq E(Var(\theta|Y))
+$$
+
+Note that we can apply these inequalities to conditional variance, i.e.
+$$
+Var(\theta|y\geq 100) \geq E(Var(\theta|y)|y\geq100)
+$$
+
+This inequality implies that, **on average**, the variance of $\theta$
+decreases as we acquire more information.
+
+However, it's important to note that simply taking $y=100$ on the
+right-hand side is different from averaging over the distribution
+$y|y\geq100$.
+
+In this particular case, the increase in variance may be attributed to a
+numerical coincidence rather than a natural phenomenon. For instance, in
+(e), if we are told that $y=100000$, it's highly probable that the
+variance would decrease, as the term $(\beta+100000)^2$ significantly
+influences the comparison between $\alpha/(\beta+100)^2$ and
+$(\alpha+1)/(\beta+100000)^2$.
+
+## Question4 (Junjie Xu)
+
+The joint density of nine observations is
+
+$$
+\begin{aligned}
+  p(Y_1,...,Y_9|\theta,\sigma^2)&=\prod_{i=1}^9 p(Y_i|\theta,\sigma^2) \\
+  &=(2\pi\sigma^2)^{-\frac{9}{2}} \exp\left\{\frac{1}{2\sigma^2}\sum_{i=1}^9(y_i-\theta)^2\right\}
+\end{aligned}
+$$
+
+Assume that the prior distribution of $\theta$ follows normal
+distribution with
+
+$$
+  \theta\sim\mathcal{N}(\mu_0,\tau_0^2)
+$$ From the lecture notes, we know the posterior distribution of
+$\theta\sim\mathcal{N}(\mu_n,\tau_n^2)$, with
+
+$$
+  \mu_n=\frac{\frac{1}{\tau_0^2}\mu_0+\frac{n}{\sigma^2}\bar{y}}{\frac{1}{\tau_0^2}+\frac{n}{\sigma^2}}, \tau_n^2=\frac{1}{\frac{1}{\tau_0^2}+\frac{n}{\sigma^2}}
+$$ From the instruction, we know that $\bar{y}=17.653$, $\sigma = 0.12$,
+$n=9$, and $\tau_0\to\infty$. Then,
+
+$$
+\begin{aligned}
+  \mu_n&=\frac{\frac{9}{0.12^2}\times17.653}{\frac{9}{0.12^2}}=17.653 \\
+  \tau_n^2&=\frac{1}{\frac{9}{0.12^2}}=0.0016
+\end{aligned}
+$$ Thus, the posterior distribution follows
+$\theta|y_1,...,y_9,\sigma^2\sim\mathcal{N}(17.653,0.0016)$.
+
+Then, for the predictive distribution, we know
+$Y_{10}|\sigma^2,y_1,...,y_9\sim\mathcal{N}(\mu_n,\tau_n^2+\sigma^2)$.
+
+Here, we can compute $\tau_n^2+\sigma^2=0.016$. So,
+
+$$
+Y_{10}|\sigma^2,y_1,...,y_9\sim\mathcal{N}(17.653,0.016)
+$$
+
+```{r}
+z_lower <- qnorm(0.005)
+z_upper <- qnorm(0.995)
+
+mean <- 17.653
+std_dev <- sqrt(0.016)
+
+lower_limit <- mean + z_lower * std_dev
+upper_limit <- mean + z_upper * std_dev
+
+cat("lower bound of 99% confidence interval:", lower_limit, "\n")
+cat("upper bound of 99% confidence interval:", upper_limit, "\n")
+```
+
+Use the formula calculation, the lower bound is
+$17.653+\sqrt{0.016}\times Z_{0.005}=17.32718$, and the upper bound is
+$17.653+\sqrt{0.016}\times Z_{0.995}=17.97882$.
+
+Thus, the 99% confidence interval is $(17.32718,17.97882)$.
+
+## Question5 (Junjie Xu)
+
+\###(a)
+
+```{r}
+# Loading Data
+
+y1 = scan('./dataset/school1.dat')
+y2 = scan('./dataset/school2.dat')
+y3 = scan('./dataset/school3.dat')
+
+```
+
+```{r}
+# Preparation
+
+#Prior Parameters
+mu0=5; s20=4; k0=1; nu0=2
+# prior
+n_1 = length(y1); ybar_1 = mean(y1); s2_1 = var(y1)
+n_2 = length(y2); ybar_2 = mean(y2); s2_2 = var(y2)
+n_3 = length(y3); ybar_3 = mean(y3); s2_3 = var(y3)
+```
+
+Here, the posterior parameters are
+
+$$
+\begin{aligned}
+  \kappa_n &= \kappa_0+n \\
+  \mu_n &= \frac{\frac{\kappa_0}{\sigma^2}\mu_0+\frac{n}{\sigma^2}\bar{y}}{\frac{\kappa_0}{\sigma^2}+\frac{n}{\sigma^2}}=\frac{\kappa_0 \mu_0+n\bar{y}}{\kappa_n} \\
+  \nu_n &= \nu_0+n \\
+  \sigma_n^2&=\frac{1}{\nu_n}\left[\nu_0\sigma_0^2+(n-1)s^2+\frac{\kappa_0n}{\kappa_n}(\bar{y}-\mu_0)^2\right]
+\end{aligned}
+$$
+
+```{r}
+#Posterior parameters
+nun_1 = nu0 + n_1 ; kn_1 = k0 + n_1
+nun_2 = nu0 + n_2 ; kn_2 = k0 + n_2 
+nun_3 = nu0 + n_3 ; kn_3 = k0 + n_3
+
+# Posterior inference
+mun_1 = (k0*mu0 + n_1*ybar_1)/kn_1
+s2n_1 = (nu0*s20 + (n_1-1)*s2_1 + k0*n_1*(ybar_1-mu0)^2/(kn_1))/nun_1 
+mun_2 = (k0*mu0 + n_2*ybar_2)/kn_2
+s2n_2 = (nu0*s20 + (n_2-1)*s2_2 + k0*n_2*(ybar_2-mu0)^2/(kn_2))/nun_2 
+mun_3 = (k0*mu0 + n_3*ybar_3)/kn_3
+s2n_3 = (nu0*s20 + (n_3-1)*s2_3 + k0*n_3*(ybar_3-mu0)^2/(kn_3))/nun_3
+```
+
+```{r}
+# monte carlo sampling 
+set.seed(551)
+
+s2sample_1 = 1/rgamma(n=10000, shape=nun_1/2, rate=s2n_1*(nun_1/2))
+s2sample_2 = 1/rgamma(n=10000, shape=nun_2 / 2, rate=s2n_2*(nun_2/2))
+s2sample_3 = 1/rgamma(n=10000, shape=nun_3 /2, rate=s2n_3*(nun_3/2))
+
+thetasample_1 = rnorm(n=10000, mean=mun_1, sd=sqrt(s2sample_1/kn_1))
+thetasample_2 = rnorm(n=10000, mean=mun_2, sd=sqrt(s2sample_2/kn_2))
+thetasample_3 = rnorm(n=10000, mean=mun_3, sd=sqrt(s2sample_3/kn_3))
+
+postpred_y1 = rnorm(n=10000, mean=thetasample_1 ,sd=sqrt(s2sample_1))
+postpred_y2 = rnorm(n=10000, mean=thetasample_2 ,sd=sqrt(s2sample_2))
+postpred_y3 = rnorm(n=10000, mean=thetasample_3 ,sd=sqrt(s2sample_3))
+```
+
+```{r}
+result.a = rbind(
+c(mean(thetasample_1), quantile(thetasample_1 , c(.025,.975)),
+mean(sqrt(s2sample_1)), quantile(sqrt(s2sample_1), c(.025,.975))), c(mean(thetasample_2),
+        quantile(thetasample_2, c(.025,.975)),
+mean(sqrt(s2sample_2)), quantile(sqrt(s2sample_2), c(.025,.975))), c(mean(thetasample_3),
+        quantile(thetasample_3, c(.025,.975)),
+mean(sqrt(s2sample_3)), quantile(sqrt(s2sample_3), c(.025,.975))))
+
+result.a
+```
+
+The output is solved above, with mean values in the first and fourth
+columns.
+
+### (b)
+
+```{r}
+t123 <- mean(thetasample_1 < thetasample_2 & thetasample_2 < thetasample_3)
+t132 <- mean(thetasample_1 < thetasample_3 & thetasample_3 < thetasample_2)
+t213 <- mean(thetasample_2 < thetasample_1 & thetasample_1 < thetasample_3)
+t231 <- mean(thetasample_2 < thetasample_3 & thetasample_3 < thetasample_1)
+t312 <- mean(thetasample_3 < thetasample_1 & thetasample_1 < thetasample_2)
+t321 <- mean(thetasample_3 < thetasample_2 & thetasample_2 < thetasample_1)
+
+cbind(t123, t132, t213, t231, t312, t321)
+```
+
+$$
+\begin{aligned}
+  P(\theta_1 < \theta_2 < \theta_3) &= 0.0052 \\
+  P(\theta_1 < \theta_3 < \theta_2) &= 0.004 \\
+  P(\theta_2 < \theta_1 < \theta_3) &= 0.0811 \\
+  P(\theta_2 < \theta_3 < \theta_1) &= 0.6766 \\
+  P(\theta_3 < \theta_1 < \theta_2) &= 0.0154 \\
+  P(\theta_3 < \theta_2 < \theta_1) &= 0.2177
+\end{aligned}
+$$
+
+### (c)
+
+```{r}
+y123 <- mean(postpred_y1 < postpred_y2 & postpred_y2 < postpred_y3) 
+y132 <- mean(postpred_y1 < postpred_y3 & postpred_y3 < postpred_y2) 
+y213 <- mean(postpred_y2 < postpred_y1 & postpred_y1 < postpred_y3) 
+y231 <- mean(postpred_y2 < postpred_y3 & postpred_y3 < postpred_y1) 
+y312 <- mean(postpred_y3 < postpred_y1 & postpred_y1 < postpred_y2) 
+y321 <- mean(postpred_y3 < postpred_y2 & postpred_y2 < postpred_y1)
+
+cbind(y123, y132, y213, y231, y312, y321)
+```
+
+$$
+\begin{aligned}
+  P(\tilde{Y_1} < \tilde{Y_2} < \tilde{Y_3}) &= 0.1028 \\
+  P(\tilde{Y_1} < \tilde{Y_3} < \tilde{Y_2}) &= 0.1055 \\
+  P(\tilde{Y_2} < \tilde{Y_1} < \tilde{Y_3}) &= 0.1843 \\
+  P(\tilde{Y_2} < \tilde{Y_3} < \tilde{Y_1}) &= 0.276 \\
+  P(\tilde{Y_3} < \tilde{Y_1} < \tilde{Y_2}) &= 0.1365 \\
+  P(\tilde{Y_3} < \tilde{Y_2} < \tilde{Y_1}) &= 0.1949
+\end{aligned}
+$$
+
+### (d)
+
+```{r}
+t1max <- mean(thetasample_1 > thetasample_2 & thetasample_1 > thetasample_3)
+y1max <- mean(postpred_y1 > postpred_y2 & postpred_y1 > postpred_y3)
+cbind(t1max, y1max)
+```
+
+$$
+\begin{aligned}
+  &P(\theta_1>\max\{\theta_2,\theta_3\}=0.8943) \\
+  &P(\tilde{Y_1}>\max\{\tilde{Y_2},\tilde{Y_3}\}=0.4709)
+\end{aligned}
+$$
