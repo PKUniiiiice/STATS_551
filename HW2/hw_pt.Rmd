@@ -1,11 +1,22 @@
 ---
-title: "STATS551 Homework2"
-author: "Junjie Xu, Minxuan Chen"
-date: "2023-10-09"
+title: "STATS 551 HW2"
+author: "Minxuan Chen"
+date: "2023/10/2"
 output:
-  pdf_document: default
+  pdf_document:
+    latex_engine: pdflatex
+    fig_width: 6
+    fig_height: 5
   html_document:
-    df_print: paged
+    fig_width: 6
+    toc_depth: 4
+  word_document:
+    toc_depth: '4'
+fontsize: 12pt
+urlcolor: blue
+editor_options: 
+  markdown: 
+    wrap: 72
 ---
 
 ```{r setup, include=FALSE}
@@ -19,34 +30,9 @@ knitr::opts_chunk$set(
 We contribute to each of the problem equally by finishing them individually and having a discussion to agree on the answers. And we improved our solution to Problem 3 together during the discussion.
 
 
-```{r}
-library(tinytex)
-```
+## Problem 1
 
-
-## Question1 (Junjie Xu)
-
-### Bayesian Coverage:
-
-**Scenario:**
-
-We employ Bayesian methodology, incorporating information about age (X), community engagement (Z), and screen time (V), to construct a credible interval for the influence of coffee consumption on residents from different countries.
-
-**Explanation:**
-
-In Bayesian coverage, considering all available information, including age, community engagement, and screen time, we build a probability distribution for the impact of coffee consumption. From this, we derive a credible interval. This interval signifies the uncertainty surrounding the influence of coffee consumption on specific demographic groups within the different countries considered. Decision-makers can utilize this interval to comprehend the variability in coffee consumption impact across different national groups and develop corresponding strategies.
-
-### Frequentist Coverage:
-
-**Scenario:**
-
-We employ Frequentist methodology, based on observed data (age X, community engagement Z, coffee consumption U, screen time V), to construct a confidence interval for the average coffee consumption among residents from different countries.
-
-**Explanation:**
-
-In Frequentist coverage, relying on sample data (i.e., observed age, community engagement, coffee consumption, and screen time), we estimate the average coffee consumption within various national groups. We construct a confidence interval, providing an estimate of the average coffee consumption for residents in different countries while accounting for the uncertainty in the estimation. Decision-makers can utilize this interval to compare coffee consumption patterns across different countries, gaining insights into these estimates' reliability.
-
-## Problem 2 (Minxuan Chen)
+## Problem 2
 ### (a)
 Prior
 $$
@@ -163,7 +149,7 @@ $$
 
 We need to calculate this value in the replicated data.
 ```{r} 
-set.seed(2304933)
+#set.seed(2304933)
 S <- 10000
 
 post_test <- function(a,b,n){
@@ -213,7 +199,7 @@ abline(v=test_obs, col='red', lwd=3)
 
 Note that the Bayesian p-value is extreme (0.0074), which shows that the Poisson sampling model and the prior of type B is not adequate.
 
-## Problem 3 (Minxuan Chen)
+## Problem 3
 ### (a)
 Prior
 $$
@@ -330,206 +316,3 @@ This inequality implies that, **on average**, the variance of $\theta$ decreases
 However, it's important to note that simply taking $y=100$ on the right-hand side is different from averaging over the distribution $y|y\geq100$.
 
 In this particular case, the increase in variance may be attributed to a numerical coincidence rather than a natural phenomenon. For instance, in (e), if we are told that $y=100000$, it's highly probable that the variance would decrease, as the term $(\beta+100000)^2$ significantly influences the comparison between $\alpha/(\beta+100)^2$ and $(\alpha+1)/(\beta+100000)^2$.
-
-
-## Question4 (Junjie Xu)
-
-The joint density of nine observations is
-
-$$
-\begin{aligned}
-  p(Y_1,...,Y_9|\theta,\sigma^2)&=\prod_{i=1}^9 p(Y_i|\theta,\sigma^2) \\
-  &=(2\pi\sigma^2)^{-\frac{9}{2}} \exp\left\{\frac{1}{2\sigma^2}\sum_{i=1}^9(y_i-\theta)^2\right\}
-\end{aligned}
-$$
-
-Assume that the prior distribution of $\theta$ follows normal distribution with
-
-$$
-  \theta\sim\mathcal{N}(\mu_0,\tau_0^2)
-$$
-From the lecture notes, we know the posterior distribution of $\theta\sim\mathcal{N}(\mu_n,\tau_n^2)$, with
-
-$$
-  \mu_n=\frac{\frac{1}{\tau_0^2}\mu_0+\frac{n}{\sigma^2}\bar{y}}{\frac{1}{\tau_0^2}+\frac{n}{\sigma^2}}, \tau_n^2=\frac{1}{\frac{1}{\tau_0^2}+\frac{n}{\sigma^2}}
-$$
-From the instruction, we know that $\bar{y}=17.653$, $\sigma = 0.12$, $n=9$, and $\tau_0\to\infty$. Then,
-
-$$
-\begin{aligned}
-  \mu_n&=\frac{\frac{9}{0.12^2}\times17.653}{\frac{9}{0.12^2}}=17.653 \\
-  \tau_n^2&=\frac{1}{\frac{9}{0.12^2}}=0.0016
-\end{aligned}
-$$
-Thus, the posterior distribution follows $\theta|y_1,...,y_9,\sigma^2\sim\mathcal{N}(17.653,0.0016)$.
-
-Then, for the predictive distribution, we know $Y_{10}|\sigma^2,y_1,...,y_9\sim\mathcal{N}(\mu_n,\tau_n^2+\sigma^2)$.
-
-Here, we can compute $\tau_n^2+\sigma^2=0.016$. So,
-
-$$
-Y_{10}|\sigma^2,y_1,...,y_9\sim\mathcal{N}(17.653,0.016)
-$$
-
-```{r}
-z_lower <- qnorm(0.005)
-z_upper <- qnorm(0.995)
-
-mean <- 17.653
-std_dev <- sqrt(0.016)
-
-lower_limit <- mean + z_lower * std_dev
-upper_limit <- mean + z_upper * std_dev
-
-cat("lower bound of 99% confidence interval:", lower_limit, "\n")
-cat("upper bound of 99% confidence interval:", upper_limit, "\n")
-```
-
-Use the formula calculation, the lower bound is $17.653+\sqrt{0.016}\times Z_{0.005}=17.32718$, and the upper bound is $17.653+\sqrt{0.016}\times Z_{0.995}=17.97882$.
-
-Thus, the 99% confidence interval is $(17.32718,17.97882)$.
-
-
-## Question5 (Junjie Xu)
-
-###(a)
-
-```{r}
-# Loading Data
-
-y1 = scan('./dataset/school1.dat')
-y2 = scan('./dataset/school2.dat')
-y3 = scan('./dataset/school3.dat')
-
-```
-
-```{r}
-# Preparation
-
-#Prior Parameters
-mu0=5; s20=4; k0=1; nu0=2
-# prior
-n_1 = length(y1); ybar_1 = mean(y1); s2_1 = var(y1)
-n_2 = length(y2); ybar_2 = mean(y2); s2_2 = var(y2)
-n_3 = length(y3); ybar_3 = mean(y3); s2_3 = var(y3)
-```
-
-Here, the posterior parameters are 
-
-$$
-\begin{aligned}
-  \kappa_n &= \kappa_0+n \\
-  \mu_n &= \frac{\frac{\kappa_0}{\sigma^2}\mu_0+\frac{n}{\sigma^2}\bar{y}}{\frac{\kappa_0}{\sigma^2}+\frac{n}{\sigma^2}}=\frac{\kappa_0 \mu_0+n\bar{y}}{\kappa_n} \\
-  \nu_n &= \nu_0+n \\
-  \sigma_n^2&=\frac{1}{\nu_n}\left[\nu_0\sigma_0^2+(n-1)s^2+\frac{\kappa_0n}{\kappa_n}(\bar{y}-\mu_0)^2\right]
-\end{aligned}
-$$
-
-```{r}
-#Posterior parameters
-nun_1 = nu0 + n_1 ; kn_1 = k0 + n_1
-nun_2 = nu0 + n_2 ; kn_2 = k0 + n_2 
-nun_3 = nu0 + n_3 ; kn_3 = k0 + n_3
-
-# Posterior inference
-mun_1 = (k0*mu0 + n_1*ybar_1)/kn_1
-s2n_1 = (nu0*s20 + (n_1-1)*s2_1 + k0*n_1*(ybar_1-mu0)^2/(kn_1))/nun_1 
-mun_2 = (k0*mu0 + n_2*ybar_2)/kn_2
-s2n_2 = (nu0*s20 + (n_2-1)*s2_2 + k0*n_2*(ybar_2-mu0)^2/(kn_2))/nun_2 
-mun_3 = (k0*mu0 + n_3*ybar_3)/kn_3
-s2n_3 = (nu0*s20 + (n_3-1)*s2_3 + k0*n_3*(ybar_3-mu0)^2/(kn_3))/nun_3
-```
-
-```{r}
-# monte carlo sampling 
-set.seed(551)
-
-s2sample_1 = 1/rgamma(n=10000, shape=nun_1/2, rate=s2n_1*(nun_1/2))
-s2sample_2 = 1/rgamma(n=10000, shape=nun_2 / 2, rate=s2n_2*(nun_2/2))
-s2sample_3 = 1/rgamma(n=10000, shape=nun_3 /2, rate=s2n_3*(nun_3/2))
-
-thetasample_1 = rnorm(n=10000, mean=mun_1, sd=sqrt(s2sample_1/kn_1))
-thetasample_2 = rnorm(n=10000, mean=mun_2, sd=sqrt(s2sample_2/kn_2))
-thetasample_3 = rnorm(n=10000, mean=mun_3, sd=sqrt(s2sample_3/kn_3))
-
-postpred_y1 = rnorm(n=10000, mean=thetasample_1 ,sd=sqrt(s2sample_1))
-postpred_y2 = rnorm(n=10000, mean=thetasample_2 ,sd=sqrt(s2sample_2))
-postpred_y3 = rnorm(n=10000, mean=thetasample_3 ,sd=sqrt(s2sample_3))
-```
-
-```{r}
-result.a = rbind(
-c(mean(thetasample_1), quantile(thetasample_1 , c(.025,.975)),
-mean(sqrt(s2sample_1)), quantile(sqrt(s2sample_1), c(.025,.975))), c(mean(thetasample_2),
-        quantile(thetasample_2, c(.025,.975)),
-mean(sqrt(s2sample_2)), quantile(sqrt(s2sample_2), c(.025,.975))), c(mean(thetasample_3),
-        quantile(thetasample_3, c(.025,.975)),
-mean(sqrt(s2sample_3)), quantile(sqrt(s2sample_3), c(.025,.975))))
-
-result.a
-```
-
-The output is solved above, with mean values in the first and fourth columns.
-
-### (b)
-
-```{r}
-t123 <- mean(thetasample_1 < thetasample_2 & thetasample_2 < thetasample_3)
-t132 <- mean(thetasample_1 < thetasample_3 & thetasample_3 < thetasample_2)
-t213 <- mean(thetasample_2 < thetasample_1 & thetasample_1 < thetasample_3)
-t231 <- mean(thetasample_2 < thetasample_3 & thetasample_3 < thetasample_1)
-t312 <- mean(thetasample_3 < thetasample_1 & thetasample_1 < thetasample_2)
-t321 <- mean(thetasample_3 < thetasample_2 & thetasample_2 < thetasample_1)
-
-cbind(t123, t132, t213, t231, t312, t321)
-```
-
-$$
-\begin{aligned}
-  P(\theta_1 < \theta_2 < \theta_3) &= 0.0052 \\
-  P(\theta_1 < \theta_3 < \theta_2) &= 0.004 \\
-  P(\theta_2 < \theta_1 < \theta_3) &= 0.0811 \\
-  P(\theta_2 < \theta_3 < \theta_1) &= 0.6766 \\
-  P(\theta_3 < \theta_1 < \theta_2) &= 0.0154 \\
-  P(\theta_3 < \theta_2 < \theta_1) &= 0.2177
-\end{aligned}
-$$
-
-### (c)
-
-```{r}
-y123 <- mean(postpred_y1 < postpred_y2 & postpred_y2 < postpred_y3) 
-y132 <- mean(postpred_y1 < postpred_y3 & postpred_y3 < postpred_y2) 
-y213 <- mean(postpred_y2 < postpred_y1 & postpred_y1 < postpred_y3) 
-y231 <- mean(postpred_y2 < postpred_y3 & postpred_y3 < postpred_y1) 
-y312 <- mean(postpred_y3 < postpred_y1 & postpred_y1 < postpred_y2) 
-y321 <- mean(postpred_y3 < postpred_y2 & postpred_y2 < postpred_y1)
-
-cbind(y123, y132, y213, y231, y312, y321)
-```
-
-$$
-\begin{aligned}
-  P(\tilde{Y_1} < \tilde{Y_2} < \tilde{Y_3}) &= 0.1028 \\
-  P(\tilde{Y_1} < \tilde{Y_3} < \tilde{Y_2}) &= 0.1055 \\
-  P(\tilde{Y_2} < \tilde{Y_1} < \tilde{Y_3}) &= 0.1843 \\
-  P(\tilde{Y_2} < \tilde{Y_3} < \tilde{Y_1}) &= 0.276 \\
-  P(\tilde{Y_3} < \tilde{Y_1} < \tilde{Y_2}) &= 0.1365 \\
-  P(\tilde{Y_3} < \tilde{Y_2} < \tilde{Y_1}) &= 0.1949
-\end{aligned}
-$$
-
-### (d)
-
-```{r}
-t1max <- mean(thetasample_1 > thetasample_2 & thetasample_1 > thetasample_3)
-y1max <- mean(postpred_y1 > postpred_y2 & postpred_y1 > postpred_y3)
-cbind(t1max, y1max)
-```
-
-$$
-\begin{aligned}
-  &P(\theta_1>\max\{\theta_2,\theta_3\}=0.8943) \\
-  &P(\tilde{Y_1}>\max\{\tilde{Y_2},\tilde{Y_3}\}=0.4709)
-\end{aligned}
-$$
