@@ -1,6 +1,4 @@
 ---
-title: "STATS 551 HW3"
-author: '...'
 output: 
   pdf_document
 header-includes:
