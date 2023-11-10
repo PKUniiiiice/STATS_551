@@ -231,11 +231,12 @@ Sigma1.sample <- do.call(rbind, lapply(samples.out, function(p) c(p$Sigma1)))
 Sigma2.sample <- do.call(rbind, lapply(samples.out, function(p) c(p$Sigma2)))
 
 #point estimate
-mu1.hat <- colMeans(mu1.sample); mu1.hat
-mu2.hat <- colMeans(mu2.sample); mu2.hat
-Zi.hat <- colMeans(Zi.sample)
-Sigma1.hat <- matrix(colMeans(Sigma1.sample), ncol=3); Sigma1.hat
-Sigma2.hat <- matrix(colMeans(Sigma2.sample), ncol=3); Sigma2.hat
+#use last 5000 sample
+mu1.hat <- colMeans(mu1.sample[5000:samp.size+1, ]); mu1.hat
+mu2.hat <- colMeans(mu2.sample[5000:samp.size+1, ]); mu2.hat
+Zi.hat <- colMeans(Zi.sample[5000:samp.size+1, ])
+Sigma1.hat <- matrix(colMeans(Sigma1.sample[5000:samp.size+1, ]), ncol=3); Sigma1.hat
+Sigma2.hat <- matrix(colMeans(Sigma2.sample[5000:samp.size+1, ]), ncol=3); Sigma2.hat
 
 #especially, for class label, to visualize, if Zi>=1.5, then cluster 2, else cluster 1
 Zi.hat.vi <- (Zi.hat>=1.5)+1; head(Zi.hat.vi)
