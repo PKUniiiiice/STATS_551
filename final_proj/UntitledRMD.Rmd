@@ -1,0 +1,63 @@
+---
+output:
+  pdf_document: default
+  html_document: default
+---
+```{r}
+# Example of initializing parameters
+# Load the lars package and the diabetes dataset
+library(reshape2)
+library(lars)
+data(diabetes)
+library(GGally)
+
+library(ggplot2)
+library(gridExtra)
+
+library("rstan") # observe startup messages
+options(mc.cores = parallel::detectCores())
+rstan_options(auto_write = TRUE)
+
+library(rjags)
+#data
+X_matrix <- diabetes$x
+class(X_matrix) <- "matrix"
+y_vector <- diabetes$y
+
+X_design <- cbind(1, X_matrix)
+set.seed(123)
+split_ind <- sample(1:length(y_vector), size=round(length(y_vector)*0.8))
+y_train <- y_vector[split_ind]
+y_test <- y_vector[-split_ind]
+
+X_train <- X_design[split_ind,]
+X_test <- X_design[-split_ind]
+
+
+
+K <- ncol(X_train)
+inits <- list(z = rep(0, K-1),
+              beta = rep(0, K),
+              sigma2temp = 1,
+              mu_beta = rep(0, K),
+              v0 = 1,
+              s0 = 1)
+
+data_list <- list(
+  N = dim(X_train)[1],  
+  K = dim(X_train)[2], 
+  x = X_train,
+  y = y_train,
+  Ik = diag(K),
+  C0 = diag(K)
+)
+
+data_ols <- data.frame(cbind(y_vector, X_matrix))
+
+ttt <- lm(y_vector~., data=data_ols)
+summary(step(ttt))
+
+```
+
+
+```
