@@ -1,0 +1,322 @@
+---
+output: 
+  pdf_document
+header-includes:
+  - \usepackage{subfig}
+---
+
+```{r}
+# Load the lars package and the diabetes dataset
+library(reshape2)
+library(lars)
+data(diabetes)
+library(GGally)
+
+library(ggplot2)
+library(gridExtra)
+
+library("rstan") # observe startup messages
+options(mc.cores = parallel::detectCores())
+rstan_options(auto_write = TRUE)
+#data
+X_matrix <- diabetes$x
+class(X_matrix) <- "matrix"
+y_vector <- diabetes$y
+
+X_design <- cbind(1, X_matrix)
+
+```
+
+
+```{r, eval=F}
+# x matrix has been standardized to have unit L2 norm in each column and zero mean
+
+#There are 10 explanatory variables, including age (age), sex (sex), body mass index (bmi) and mean arterial blood pressure (map) of 442 patients as well as six blood serum measurements (tc, ldl, hdl, tch, ltg and glu).
+
+
+#https://garthtarr.github.io/mplot/reference/diabetes.html
+
+#tc
+#Total cholesterol (mg/dL)? Desirable range: below 200 mg/dL
+
+#ldl
+#Low-density lipoprotein ("bad" cholesterol)? Desirable range: below 130 mg/dL
+
+#hdl
+#High-density lipoprotein ("good" cholesterol)? Desirable range: above 40 mg/dL
+
+#serum concentration of lamorigine (LTG),
+#glucose (GLU)
+
+
+#https://hastie.su.domains/Papers/LARS/
+
+data_xy <- data.frame(X=X_matrix, y=y_vector)
+ggpairs(rawx[c(1,3,4,11)])
+ggpairs(rawx[c(5:10,11)])
+```
+
+```{r,eval=F}
+#ggpairs(data_xy, columns=c(1,3,4,11),
+#       ggplot2::aes(color=as.factor(X.sex>0)))
+data_xy$X.tch.new <- rawx$S4.new
+ggpairs(data_xy, columns=1:4,
+    ggplot2::aes(color=factor(X.tch.new),alpha = 0.7))
+```
+
+```{r,eval=F}
+rawx$S4.new <- 1
+rawx$S4.new[which(rawx$S4<3)] <- 2
+rawx$S4.new[which((rawx$S4>=3) & (rawx$S4<4))] <- 3
+rawx$S4.new[which((rawx$S4>=4) & (rawx$S4<5))] <- 4
+rawx$S4.new[which((rawx$S4>=5) & (rawx$S4<6))] <- 5
+rawx$S4.new[which(rawx$S4>=6)] <- 6
+```
+
+
+
+```{r, eval=F}
+# First, boxplot and density plot of tch
+plot1 <- ggplot(X_temp, aes(x = factor(1), y = tch)) +
+  geom_boxplot(fill = "skyblue", color = "black", alpha = 0.7) +
+  ggtitle("Boxplot of tch") +
+  theme_minimal()
+
+plot2 <- ggplot(X_temp, aes(x = tch)) +
+  geom_density(fill = "skyblue", color = "black") +
+  ggtitle("Density Plot of tch") +
+  theme_minimal()
+
+# Second, boxplot and density plot of tch, classified by sex
+plot3 <- ggplot(X_temp, aes(x = factor(as.integer(sex>0)), y = tch,
+                            fill = factor(as.integer(sex>0)))) +
+  geom_boxplot(color = "black", alpha = 0.7) +
+  labs(x = "Sex", y = "tch", fill = "Sex",  
+       # Set axis and fill labels
+       title = "Boxplot of tch by Sex")
+
+plot4 <- ggplot(data_xy, aes(x = y,
+                            color = factor(X.tch.new)))+
+  geom_density()+
+  labs(x = "tch", y = "Density", color = "Sex",  
+       # Set axis and fill labels
+       title = "Density Plot of tch by Sex")
+
+# Display the plots
+plot4
+```
+
+
+```{r}
+rawx <- read.table(file='https://hastie.su.domains/Papers/LARS/diabetes.data', header=T)
+
+ggpairs(rawx[c(1,3,4)])
+ggpairs(rawx[5:10])
+```
+
+
+```{r}
+x <- diabetes$x
+y <- diabetes$y
+# Pairwise scatter plots for the first six variables in x
+pairs_data <- as.data.frame(x[, 1:6])
+pairs_plot <- ggplot(pairs_data, aes(color = y)) +
+  geom_point() +
+  ggtitle("Pairwise Scatter Plots for x")
+
+# Boxplot of the target variable "y" (disease progression)
+boxplot_plot <- ggplot() +
+  geom_boxplot(aes(y = y)) +
+  ggtitle("Boxplot of Disease Progression (y)") +
+  ylab("Disease Progression")
+
+# Correlation matrix heatmap for all variables in x
+cor_matrix_x <- cor(x)
+cor_matrix_plot <- ggplot(data = as.data.frame(cor_matrix_x), aes(x = Var1, y = Var2, fill = value)) +
+  geom_tile() +
+  ggtitle("Correlation Matrix Heatmap for x")
+
+# Histogram of the target variable "y"
+hist_plot <- ggplot() +
+  geom_histogram(aes(x = y), fill = "lightblue", color = "black") +
+  ggtitle("Histogram of Disease Progression (y)") +
+  xlab("Disease Progression")
+
+# Scatter plot of the first column in x against "y"
+scatter_plot_x1 <- ggplot(data = as.data.frame(cbind(x[, 1], y)), aes(x = V1, y = y)) +
+  geom_point(color = "blue") +
+  ggtitle("Scatter Plot: x1 vs. Disease Progression") +
+  xlab("x1") +
+  ylab("Disease Progression")
+
+
+
+```
+
+The x matrix has been standardized to have unit L2 norm in each column and zero mean. 
+
+We can directly use x and y.
+
+(In extended models, we may consider x2.)
+
+```{r}
+#ols
+
+ols <- lm(y_vector~X_matrix)
+summary(ols)
+
+```
+
+
+
+
+we use rstan.
+```{r}
+set.seed(123)
+# Create a data list for Stan
+data_list_m1 <- list(
+  N = length(y_vector),  # Number of observations
+  K = dim(X_design)[2], # Number of predictors
+  x = X_design,  # Predictor variable
+  y = y_vector  # Response variable
+)
+
+
+# Compile the Stan model
+stan_m1 <- stan_model(file='./priors/prior_M1_v2.stan')
+
+# Fit the model to the data
+stan_fit_m1 <- sampling(stan_m1,
+                     data = data_list_m1,
+                     chains = 4,
+                     iter = 2000)
+
+# Print a summary of the results
+print(stan_fit_m1)
+
+# Plot the posterior distributions
+plot(stan_fit_m1,
+     pars=c('beta', 'sigma'))
+
+```
+```{r}
+g <- plot(stan_fit_m1, pars = c('beta', 'sigma'))
+ggsave("./plots/M1_noninfo_prior.pdf", g, width = 8, height = 6)
+```
+
+
+```{r}
+#m1
+plot(stan_fit_m1,
+     pars=c('beta', 'sigma'))
+plot(stan_fit_m1,
+     pars=c('beta', 'sigma'), show_density = TRUE)
+plot(stan_fit_m1,
+     pars=c('beta', 'sigma'), plotfun = "hist",  include = FALSE)
+plot(stan_fit_m1,
+     pars=c('beta', 'sigma'), plotfun = "trace")
+
+```
+
+
+
+M2
+```{r}
+# Create a data list for Stan
+#set.seed(123)
+data_list_m2 <- list(
+  N = length(y_vector),  # Number of observations
+  K = dim(X_design)[2], # Number of predictors, contain intercept
+  x = X_design,  # Predictor variable
+  y = y_vector,  # Response variable
+  
+  m0 = rep(1, dim(X_design)[2]),
+  C0 = diag(1, dim(X_design)[2]),
+  v0 = 1,
+  s0 = 1
+)
+
+
+# Compile the Stan model
+stan_m2 <- stan_model(file='./priors/prior_M2.stan')
+
+# Fit the model to the data
+stan_fit_m2 <- sampling(stan_m2,
+                     data = data_list_m2,
+                     chains = 4,
+                     iter = 2000)
+
+# Print a summary of the results
+print(stan_fit_m2)
+
+# Plot the posterior distributions
+g <- plot(stan_fit_m2,
+     pars=c('beta', 'sigma'))
+
+ggsave("./plots/M2_conju_prior.pdf", g, width = 8, height = 6)
+```
+
+M3
+```{r}
+# Create a data list for Stan
+set.seed(123)
+data_list_m3 <- list(
+  N = length(y_vector),  # Number of observations
+  K = dim(X_design)[2], # Number of predictors, contain intercept
+  x = X_design,  # Predictor variable
+  y = y_vector,  # Response variable
+  
+  b0 = c(5,7,10,9,29,10,39,2,48,10,23),
+  g = 1
+)
+
+
+# Compile the Stan model
+stan_m3 <- stan_model(file='./priors/prior_M3.stan')
+
+# Fit the model to the data
+stan_fit_m3 <- sampling(stan_m3,
+                     data = data_list_m3,
+                     chains = 4,
+                     iter = 2000)
+
+# Print a summary of the results
+print(stan_fit_m3)
+
+# Plot the posterior distributions
+plot(stan_fit_m3,
+     pars=c('beta', 'sigma'))
+
+```
+
+```{r}
+# Create a data list for Stan
+set.seed(123)
+data_list_m6 <- list(
+  N = length(y_vector),  # Number of observations
+  K = dim(X_design)[2], # Number of predictors, contain intercept
+  x = X_design,  # Predictor variable
+  y = y_vector,  # Response variable
+  b0 = c(5,7,10,9,29,10,39,2,48,10,23)
+)
+
+
+# Compile the Stan model
+stan_m6 <- stan_model(file='./priors/prior_M6.stan')
+
+# Fit the model to the data
+stan_fit_m6 <- sampling(stan_m6,
+                     data = data_list_m6,
+                     chains = 4,
+                     iter = 2000)
+
+# Print a summary of the results
+print(stan_fit_m6)
+
+# Plot the posterior distributions
+plot(stan_fit_m6,
+     pars=c('beta', 'sigma', 'g'))
+```
+
+
+

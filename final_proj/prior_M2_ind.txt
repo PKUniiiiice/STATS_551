@@ -1,0 +1,29 @@
+model {
+  # Prior for z
+  for (i in 1:(K-1)) {
+    z[i] ~ dbern(0.5)
+  }
+
+  # Hyperprior
+  
+  v0 ~ dt(0, 1, 1)T(0,)
+  s0 ~ dt(0, 1, 1)T(0,)
+  mu_beta ~ dmnorm(rep(0, K), inverse(t(x) %*% x))
+  
+  # Prior
+  sigma2temp ~ dgamma(v0/2, s0/2)
+  
+  beta ~ dmnorm(mu_beta,  sigma2temp*inverse(t(x) %*% x))
+
+  # Transform parameters
+  
+  beta_ind[1] <- beta[1]
+  for (i in 2:K) {
+    beta_ind[i] <- beta[i] * z[i-1]
+  }
+
+  # Likelihood
+  for (i in 1:N) {
+    y[i] ~ dnorm(sum(x[i,] * beta_ind), sigma2temp)
+  }
+}

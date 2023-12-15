@@ -1,0 +1,58 @@
+---
+output:
+  pdf_document: default
+  html_document: default
+---
+```{r}
+# Load the lars package and the diabetes dataset
+library(reshape2)
+library(lars)
+data(diabetes)
+library(GGally)
+
+library(ggplot2)
+library(gridExtra)
+
+library("rstan") # observe startup messages
+options(mc.cores = parallel::detectCores())
+rstan_options(auto_write = TRUE)
+#data
+X_matrix <- diabetes$x
+class(X_matrix) <- "matrix"
+y_vector <- diabetes$y
+
+X_design <- cbind(1, X_matrix)
+```
+
+```{r}
+
+data_list <- list(
+  N = dim(X_design)[1],  
+  K = dim(X_design)[2], 
+  x = X_design,
+  y = y_vector
+)
+
+model_hier <- stan_model(file='./prior_M2_hier.stan')
+
+# Create a data list for Stan
+set.seed(4827493)
+
+
+# Fit the model to the data
+stan_fit_hier <- sampling(model_hier,
+                     data = data_list,
+                     chains = 4,
+                     iter = 5000)
+
+# Print a summary of the results
+print(stan_fit_hier)
+
+# Plot the posterior distributions
+g <- plot(stan_fit_hier,
+     pars=c("beta", "sigma"))
+
+
+ggsave("./plots/M2_conj_hier_prior_4827493.pdf", g, width = 8, height = 6)
+
+```

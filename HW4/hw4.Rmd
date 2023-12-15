@@ -1,0 +1,481 @@
+---
+output: 
+  pdf_document
+header-includes:
+  - \usepackage{subfig}
+---
+
+## Problem 2
+First, we condition the whole model on $K$. 
+
+We will specify the parameters and hyperparameters, the likelihood and the full conditional distributions.
+
+We denote the points in dataset by $\mathbf{X}$, which is a $n\times 3$ matrix. Each row of $\mathbf{X}$ corresponds to a point, denoted by $X_i$.
+
+For each point $X_i$, we assign a class label to it, denoted by $Z_i, Z_i=1,2,\cdots,K$. They are latent variables in this model.
+
+The probability that point $X_i$ belongs to class $j$ is denoted by $p_j$. Since we have $K$ classes in total, we have a probability vector $(p_1, p_2,\cdots,p_K)$ with $\sum_ip_i=1$. This vector is in $\mathbb{R}^{K-1}$ space, so for simplicity, we only consider $(p_1,p_2,\cdots,p_{K-1})$ and get $p_K$ by $p_K=1-\sum_{i=1}^{K-1}p_i$.
+
+When the class of point $X_i$ is known, for example $Z_i=j$. The distribution of $X_i$ is normal with parameters $(\mu_j, \Sigma_j)$, i.e.
+$$
+X_i|Z_i=j \sim N(\mu_j, \Sigma_j)
+$$
+Thus, we need $2K$ parameters in total for the mixture density, denoted by
+$(\mu_1,\Sigma_1,\mu_2,\Sigma_2,\cdots,\mu_K,\Sigma_K)$.
+
+In summary, we regard $(p_1,\cdots,p_{K-1},\mu_1,\Sigma_1,\cdots,\mu_K,\Sigma_K)$ as parameters.
+
+And the class labels $(Z_1,\cdots,Z_n)$ as latent variables.
+
+For priors on parameters, it's reasonable to assume some independence
+$$
+\begin{aligned}
+&p(p_1,\cdots,p_{K-1},\mu_1,\Sigma_1,\cdots,\mu_K,\Sigma_K) \\
+=&p(p_1,\cdots,p_{K-1})\prod_ip(\mu_i,\Sigma_i)
+\end{aligned}
+$$
+
+We write out the posterior of 
+$$
+(\mathbf{Z}, \mathbf{p}, \boldsymbol{\mu}, \mathbf{\Sigma})=(Z_1,\cdots,Z_n, p_1,\cdots,p_{K-1},\mu_1,\Sigma_1,,\cdots,\mu_K,\Sigma_K)
+$$
+
+$$
+\begin{aligned}
+&p(\mathbf{Z}, \mathbf{p}, \boldsymbol{\mu}, \mathbf{\Sigma}|\mathbf{X})\\
+\propto& p(\mathbf{X}|\mathbf{Z}, \mathbf{p}, \boldsymbol{\mu}, \mathbf{\Sigma})p(\mathbf{Z}, \mathbf{p}, \boldsymbol{\mu}, \mathbf{\Sigma}) \\
+\propto&\prod_{i=1}^n p(X_i|\mathbf{Z}, \mathbf{p}, \boldsymbol{\mu}, \mathbf{\Sigma})p(\mathbf{Z}| \mathbf{p}, \boldsymbol{\mu}, \mathbf{\Sigma})p(\mathbf{p}, \boldsymbol{\mu}, \mathbf{\Sigma})\\
+\propto& \left(\prod_{i=1}^n p(X_i|Z_i, \boldsymbol{\mu}, \mathbf{\Sigma})\right) \left( \prod_{i=1}^n p(Z_i|\mathbf{p})\right)
+p(p_1,\cdots,p_{K-1})\prod_{j=1}^K p(\mu_j,\Sigma_j)
+\end{aligned}
+$$
+
+For the first term, let $f(x|\mu_t,\Sigma_t)$ denote the density of normal distribution $N(\mu_t, \Sigma_t)$. We use the indicator $I(Z_i=t)$ to represent whether point $X_i$ belongs to class $t$. It takes the value 1 if $Z_i=t$, otherwise 0. Then
+
+$$
+\begin{aligned}
+p(X_i|Z_i, \boldsymbol{\mu}, \mathbf{\Sigma})=\sum_{t=1}^K I(Z_i=t)f(X_i|\mu_t,\Sigma_t)
+\end{aligned}
+$$
+Note that although this expression is complicated, as long as $Z_i$ is given, $p(X_i|Z_i, \boldsymbol{\mu}, \mathbf{\Sigma})$ only contains one term, which is some normal density. Therefore, for the product, we can rewrite the summation index to get
+$$
+\begin{aligned}
+&\prod_{i=1}^np(X_i|Z_i, \boldsymbol{\mu}, \mathbf{\Sigma}) \\
+=&\prod_{t=1}^K \prod_{i:Z_i=t} f(X_i|\mu_t,\Sigma_t)
+\end{aligned}
+$$
+We can next combine this term with the last one
+$$
+\prod_{i=1}^np(X_i|Z_i, \boldsymbol{\mu}, \mathbf{\Sigma}) \prod_{j=1}^K p(\mu_j,\Sigma_j) =  \prod_{t=1}^K \left( p(\mu_t,\Sigma_t) \cdot \prod_{i:Z_i=t} f(X_i|\mu_t,\Sigma_t)  \right)
+$$
+
+Note that the inner term describe the prior and likelihood of normal $N(\mu_t,\Sigma_t)$. Therefore, it's reasonable to assign a Jeffreys' prior to $(\mu_t, \Sigma_t)$, which is 
+$$
+p(\mu_t, \Sigma_t) \propto |\Sigma_t|^{-5/2} ,t=1,2,\cdots,K
+$$
+
+For the second term, by definition of $\mathbf{p}$, we have
+$$
+p(Z_i|\mathbf{p}) = p_1^{I(Z_i=1)}p_2^{I(Z_i=2)}\cdots p_{K}^{I(Z_i=K)} = \prod_{t=1}^K p_t^{I(Z_i=t)}
+$$
+and
+$$
+\begin{aligned}
+\prod_{i=1}^n p(Z_i|\mathbf{p}) & = \prod_{i=1}^n \prod_{t=1}^K p_t^{I(Z_i=t)} \\
+&=\prod_{t=1}^K \prod_{i=1}^np_t^{I(Z_i=t)} \\
+&=\prod_{t=1}^K p_t^{\sum_{i=1}^n 
+I(Z_i=t)}
+\end{aligned}
+$$
+This term is the likelihood of a multinomial distribution. Therefore, it's reasonable to assign a Dirichlet distribution on the parameter $(p_1,\cdots,p_{K-1})$, that is
+$$
+p(p_1,\cdots,p_{K-1}) \propto  \left(1-\sum_{t=1}^{K-1}p_t\right)^{\alpha_K-1} \prod_{t=1}^{K-1} p_t^{\alpha_t-1}=\prod_{t=1}^K p_t^{\alpha_t-1}
+$$
+For simplicity, we take $\alpha_t=1, t=1,2,\cdots,K$, then
+$$
+p(p_1,\cdots,p_{K-1}) \propto 1
+$$
+From above, we can get
+$$
+\begin{aligned}
+&p(\mathbf{Z}, \mathbf{p}, \boldsymbol{\mu}, \mathbf{\Sigma}|\mathbf{X})\\
+\propto& \prod_{t=1}^K \left( p(\mu_t,\Sigma_t) \cdot \prod_{i:Z_i=t} f(X_i|\mu_t,\Sigma_t)  \right) 
+\prod_{t=1}^K p_t^{\sum_{i=1}^n 
+I(Z_i=t)}   \\
+\propto&  \prod_{t=1}^K \left( p(\mu_t,\Sigma_t) \cdot \prod_{i:Z_i=t} f(X_i|\mu_t,\Sigma_t)  \right) \prod_{t=1}^K
+p_t^{\sum_{i=1}^n 
+I(Z_i=t)} 
+\end{aligned}
+$$
+Now, very similar to Homework 3, problem 3, we have
+$$
+p(\mu_t|\cdot) \sim N(\bar{X}_t,\frac{\Sigma_t}{n_t}), t=1,2,\cdots,K
+$$
+in which
+$$
+\begin{aligned}
+&n_t = \sum_{i=1}^nI(Z_i=t)=\text{ # points in class t} \\
+&\bar{X}_t = \frac{1}{n_t} \sum_{i:\,Z_i=t} X_i
+\end{aligned}
+$$
+and (using the notation in the book Bayesian Data Analysis Third edition)
+$$
+p(\Sigma_t|\cdots) \propto  \text{Inv-Wishart}_{n_t+1}((S^0_t)^{-1})
+$$
+in which
+$$
+\begin{aligned}
+&n_t \text{ follows above}\\
+&S_t^0 = \sum_{i:\,Z_i=t}^n (X_i-\mu_t)(X_i-\mu_t)^T
+\end{aligned}
+$$
+and
+$$
+\begin{aligned}
+p(p_1,\cdots,p_{K-1}|\cdot) &\propto \prod_{t=1}^K
+p_t^{\sum_{i=1}^n 
+I(Z_i=t)} \\
+&\sim \text{Dirichlet}(1+n_1,1+n_2,\cdots,1+n_K)
+\end{aligned}
+$$
+in which
+$$
+n_t \text{ follows above}, t=1,2,\cdots,K
+$$
+and
+$$
+\begin{aligned}
+p(Z_i=t|\cdot)  \propto f(X_i|\mu_t,\Sigma_t) p_t
+\end{aligned}
+$$
+After getting all these, we consider when $K$ is random. We assign a prior to it, for example, a truncated poisson distribution.
+$$
+p(K=k) \propto \frac{\lambda^k}{k!}\mathbb{I}\{k\leq100\}
+$$
+Here $\lambda$ is a constant, for simplicity, we take $\lambda=4$.
+
+Note that we have pointed out, the previous derivation is conditioned on $K$, in other words, we have got the full conditional distribution of $\theta=(\mathbf{Z}, \mathbf{p}, \boldsymbol{\mu}, \mathbf{\Sigma})$, i.e.
+$$
+p(\theta|\mathbf{X},K)
+$$
+and the prior becomes
+$$
+p(\theta,K) = p(\theta|K)p(K)
+$$
+Now for full conditional distribution of $K$, we have
+$$
+\begin{aligned}
+p(K|\theta,\mathbf{X}) &= p(K,\theta|\mathbf{X})/p(\theta|\mathbf{X}) \\
+&\propto p(\mathbf{X}|\theta,K)p(\theta|K)p(K)
+\end{aligned}
+$$
+Note that for the first two terms $p(\mathbf{X}|\theta,K)p(\theta|K)$, we have already calculated them in $p(\theta|\mathbf{X},K)$, but ommited $K$ in conditional set. So
+$$
+\begin{aligned}
+p(K|\theta,\mathbf{X}) &\propto  \prod_{t=1}^K \left( p(\mu_t,\Sigma_t) \cdot \prod_{i:Z_i=t} f(X_i|\mu_t,\Sigma_t)  \right) \prod_{t=1}^K
+p_t^{\sum_{i=1}^n 
+I(Z_i=t)}  \frac{\lambda^K}{K!}\mathbb{I}\{K\leq100\}
+\end{aligned}
+$$
+
+### (b)
+
+Sampling from this model using the standard Gibbs sampler is infeasible. The primary challenge arises from the fact that, even though we possess the complete conditional distribution of all parameters, alterations in the value of $K$ lead to changes in the dimensionality of the parameters.
+
+Consequently, the transition process involves not only traversing between different parameters within a single space but also between two spaces with varying dimensions. Relying solely on transition kernels induced by the full conditional distribution is inadequate due to their fixed dimensions, resulting in a reducible Markov chain. Then there is no guarantee that this chain will converge to true posterior distribution.
+
+To address this issue, we find out a method called [Reversible-jump Markov chain Monte Carlo](https://en.wikipedia.org/wiki/Reversible-jump_Markov_chain_Monte_Carlo). It is introduced by Peter J.Green in the paper [Reversible jump Markov chain Monte Carlo computation and Bayesian model determination](https://academic.oup.com/biomet/article/82/4/711/252058?login=true). It allows simulation of the posterior distribution on spaces of varying dimensions.
+
+This method is based on the Metropolis-Hastings algorithm and requires the construction of a mapping and then the acceptance probability. However, the derivation and implementation of sampling are too complex. We have few ideas on how to solve these problems.
+
+
+Therefore, to perform the sampling and determine the optimal $K$. We just use 5 fixed values of $K$ and standard Gibbs samplers. After sampling, we use posterior means as estimation and calculate AIC value of these 5 models. We choose the model with lowest value as the final result.
+
+We choose $K=2,3,4,5,6$. The conditional posterior of $\theta$ is
+
+$$
+\begin{aligned}
+&p(\mathbf{Z}, \mathbf{p}, \boldsymbol{\mu}, \mathbf{\Sigma}|\mathbf{X},K)\\
+
+\propto&  \prod_{t=1}^K \left( p(\mu_t,\Sigma_t) \cdot \prod_{i:Z_i=t} f(X_i|\mu_t,\Sigma_t)  \right) \prod_{t=1}^K
+p_t^{\sum_{i=1}^n 
+I(Z_i=t)} 
+\end{aligned}
+$$
+
+```{r, p3c}
+library(MCMCpack)
+library(mvtnorm)
+library(dplyr)
+mixgauss <- read.table("./mixgauss.dat", header=FALSE)
+n <- nrow(mixgauss) #mixgauss is n x 3 shape
+p <- 3
+
+
+#' Function get class center
+#' 
+#' @param X data matrix (n,3)
+#' @param Z vector class label
+#' @return mu class center
+class_center <- function(X, Z){
+  Xnew <- as.data.frame(cbind(X, Z))
+  
+  # Group by class label and calculate the mean for each group
+  colnames(Xnew) <- c("x", "y", "z", "class_label")
+  
+  class_centers <- Xnew %>%
+    group_by(class_label) %>%
+    summarise(center_x = mean(x),
+              center_y = mean(y),
+              center_z = mean(z)) %>%
+    ungroup() %>%
+    arrange(class_label)
+# Return the result as a matrix
+  return(as.matrix(class_centers[, c("center_x", "center_y", "center_z")]))
+}
+
+#' Gibbs sampler for p, \mu, \Sigma, Z
+#' @param X data matrix (n,3)
+#' @param Z vector class label
+#' @param p vector p1,p2,...pK-1
+#' @param Sigma vector of matrix 
+#' @param mu matrix, row i is mu_i
+#' @return sample of step t
+Gibbs <- function(X, Z, p, Sigma, mu, K){
+  ni <- 1:K
+  ni <- sapply(ni, function(x) sum(Z==x))
+  
+  
+  #sample p
+  p.t <- c(rdirichlet(1, 1+ni))
+  #sample mu
+  mu.t <- matrix(0, nrow=K, ncol=3)
+  
+  #get class center
+  class_centers <- class_center(X, Z)
+  for (i in 1:K){
+    mu.t[i,] <- c(mvtnorm::rmvnorm(1,
+                         class_centers[i,],
+                         Sigma[[i]]/ni[i]))
+  }
+  #sample Sigma
+  Sigma.t <- vector("list", K)
+  for (i in 1:K){
+    Xi <- t(X[Z==i, ])
+    Si <- tcrossprod(Xi - mu.t[i,])
+    Sigma.t[[i]] <- MCMCpack::riwish(ni[i]+1, Si)
+  }
+  
+  #unnormalized prob
+  pZi <- 1:K
+  pZi <- sapply(pZi,
+                function(i) (dmvnorm(X, mean=mu.t[i, ], sigma=Sigma.t[[i]])*p.t[i])
+                )
+  #print(pZi)
+  Z.t <- 1:nrow(X)
+  Z.t <- sapply(Z.t, function(i)
+                sample(1:K, size=1, replace=TRUE,
+                       prob=pZi[i,]))
+  
+  return(list(Z=Z.t, mu=mu.t, Sigma=Sigma.t, p=p.t))
+}
+
+#sampling
+
+sampling_4_fix_K <- function(K, X){
+  #we need initial value for  Z_1,\cdots,Z_n, p_1,\cdots,p_{K},
+  #\mu_1,\Sigma_1,,\cdots,\mu_K,\Sigma_K,
+  #K
+  p.0 <- rep(1/K, K) # vector p1,p2,...pK
+  Z.0 <- sample(1:K, n, replace=TRUE) # class label Z1...Zn
+  mu.0 <- matrix(0, ncol=p, nrow=K) #class center
+  Sigma.0 <- vector("list", K)
+  for (i in 1:K){
+    Sigma.0[[i]] <- diag(p)
+  }
+  
+  samp.size <- 10000
+  samples.out <- vector("list", samp.size+1)
+  samples.out[[1]] <- list(Z=Z.0, mu=mu.0,
+                             Sigma=Sigma.0, p=p.0)
+  for (i in 2:(samp.size+1)){
+    samples.out[[i]] <- do.call(Gibbs,
+                                args=c(list(X=X, K=K), samples.out[[i-1]]))
+  }
+  
+  mu.sample <- array(unlist(lapply(samples.out, function(p) p$mu)),
+                      dim = c(K, 3, samp.size+1))
+  Z.sample <- do.call(rbind, lapply(samples.out, function(p) p$Z))
+  Sigma.sample <- lapply(samples.out, function(p) p$Sigma)
+  
+  #point estimate
+  #use last 5000 sample
+  mu.hat <- rowMeans(mu.sample[ , , 5000:samp.size+1], dims=2)
+  
+  #zhat we use round
+  Z.hat <- round(colMeans(Z.sample[5000:samp.size+1, ]))
+  
+  Sigma.hat <- vector("list", K)
+  for (i in 1:K){
+    Sigmai <- lapply(Sigma.sample, function(p) p[[i]])
+    Sigmai.hat <- array(unlist(Sigmai),
+                        dim=c(3,3, samp.size+1))
+    Sigma.hat[[i]] <- rowMeans(Sigmai.hat[ , , 5000:samp.size+1], dims=2)
+  }
+  
+  #BIC
+  #-2log(y|theta)+klog(n)
+  #likelihood
+  #&\prod_{i=1}^np(X_i|Z_i, \boldsymbol{\mu}, \mathbf{\Sigma}) \\
+  #=&\prod_{t=1}^K \prod_{i:Z_i=t} f(X_i|\mu_t,\Sigma_t)
+  likelihood <- 1:K
+  likelihood <- -2*sum(log(sapply(likelihood,
+                       function(t) prod(dmvnorm(X[Z.hat==t,],
+                                                mean=mu.hat[t,],
+                                                sigma=Sigma.hat[[t]])))))
+  bic <- likelihood + log(nrow(X))*(
+    K*3+K*6+K-1 #mu #sigma #p
+  )
+
+  return (list(bic=bic,
+               mu.hat=mu.hat,
+               Z.hat=Z.hat,
+               Sigma.hat=Sigma.hat))
+}
+
+
+```
+
+```{r}
+results <- vector("list", 5)
+for (k in 2:6){
+  set.seed(102932)
+  results[[k-1]] <- sampling_4_fix_K(X=mixgauss, K=k)
+  print(results[[k-1]])
+}
+
+```
+
+
+```{r}
+debug(sampling_4_fix_K(X=mixgauss, K=3))
+
+
+```
+
+
+
+
+
+It's not easy to embed an interactive plotly object in a pdf file. So we use two ways to visualize. First, we take two snapshots of these points.
+
+```{=latex}
+\begin{figure}[!htbp]
+  \centering
+  \subfloat{\includegraphics[width=0.45\linewidth]{"./p1.png"}}
+  \subfloat{\includegraphics[width=0.45\linewidth]{"./p2.png"}}
+\end{figure}
+```
+
+Second, we plot the projection of the data points and the contour of marginal distribution in three coordinate planes. To get the contour, we use the point estimate of $p_2$ to calculate the density.
+
+```{=latex}
+\begin{figure}[!htbp]
+  \centering
+  \subfloat[X-Y Plane]{\includegraphics[width=0.45\linewidth]{"./pxy.png"}}
+  \subfloat[X-Z Plane]{\includegraphics[width=0.45\linewidth]{"./pxz.png"}}\\
+  \subfloat[Y-Z Plane]{\includegraphics[width=0.45\linewidth]{"./pyz.png"}}
+\end{figure}
+```
+We show the cluster centers by square symbol. However, from the plots, maybe it's not appropriate to assume that the data comes from 2 classes.
+
+\newpage
+
+```{r visual, eval=FALSE}
+library(plotly, warn.conflicts=FALSE)
+# Create a 3D scatter plot with different colors for each class
+scatter_plot <- plot_ly(data = mixgauss,
+                        x = ~mixgauss[, 1], y = ~mixgauss[, 2], z = ~mixgauss[, 3],
+                        type = "scatter3d", color = ~factor(Zi.hat.vi),
+                        mode="markers",
+                        opacity=0.7)
+
+# Add the cluster center to the scatter plot
+center <- data.frame(rbind(mu1.hat, mu2.hat))
+colnames(center) <- c("x", "y", "z")
+center$class <- c("c1", "c2")
+final_plot <- scatter_plot %>%
+  add_trace(data=center,
+              x=~x,
+              y=~y,
+              z=~z,
+              color=~class,
+              mode="markers",
+              type="scatter3d",
+              opacity=1,
+              marker = list(size = 10, symbol = "square"))
+
+p2.hat <- mean(do.call(c, lapply(samples.out, function(p) p$p2)))
+
+# x-y plane
+x <- seq(-10, 12, length.out = 200)
+y <- seq(-10, 12, length.out = 200)
+grid <- expand.grid(x, y)
+
+itr <- list(c(1,2,3), c(1,3,2), c(2,3,1))
+out <- vector("list", 3)
+for (i in 1:3){
+  a <- itr[[i]][3]
+  o1 <- itr[[i]][1]
+  o2 <- itr[[i]][2]
+# Calculate density values for both distributions
+density1 <- dmvnorm(grid, mean = mu1.hat[-a], sigma = Sigma1.hat[-a, -a])
+density2 <- dmvnorm(grid, mean = mu2.hat[-a], sigma = Sigma2.hat[-a, -a])
+density <- (1-p2.hat)*density1+p2.hat*density2
+contour_plot1 <- plot_ly(x = x, y = y,
+                        z = matrix(density, ncol=200, byrow=TRUE),
+                        type = "contour")
+options(warn = -1)
+p <- contour_plot1 %>% add_trace(x = mixgauss[Zi.hat.vi==1,o1],
+                            y = mixgauss[Zi.hat.vi==1,o2],
+                            type = "scatter", mode = "markers",
+                            marker = list(color = "cyan") ) %>%
+                  add_trace(x = mixgauss[Zi.hat.vi==2,o1],
+                            y = mixgauss[Zi.hat.vi==2,o2],
+                            type = "scatter", mode = "markers",
+                            marker = list(color = "red")) %>%
+                  add_trace(x = mu1.hat[o1],
+                            y = mu1.hat[o2],
+                            type = "scatter", mode = "markers",
+                            marker = list(color = "black",symbol="square"),
+                            name = "C1 Center") %>%
+                  add_trace(x = mu2.hat[o1],
+                            y = mu2.hat[o2],
+                            type = "scatter", mode = "markers",
+                            marker = list(color = "black", symbol="square"),
+                            name = "C2 Center")
+out[[i]] <- p
+}
+```
+
+-->
+<!--
+<!-- density2 <- dmvnorm(grid, mean = mu2.hat[-1], sigma = Sigma2.hat[-1, -1])
+
+<!-- It's hard to visualize density in 3-d space. So we can consider the marginal, for example, on x-y space. -->
+<!-- ```{r} -->
+<!-- x <- seq(-10, 15, length.out = 200) -->
+<!-- y <- seq(-10, 15, length.out = 200) -->
+<!-- grid <- expand.grid(x1, y1) -->
+
+<!-- # Calculate density values for both distributions -->
+<!-- density1 <- dmvnorm(grid, mean = mu1.hat[-1], sigma = Sigma1.hat[-1, -1]) -->
+<!-- density2 <- dmvnorm(grid, mean = mu2.hat[-1], sigma = Sigma2.hat[-1, -1]) -->
+<!-- contour_plot1 <- plot_ly(x = x, y = y,  -->
+<!--                          z = matrix(density1, ncol=200, byrow=TRUE), type = "contour") -->
+<!-- # Create the second contour plot -->
+<!-- contour_plot2 <- plot_ly(x = x, y = y,  -->
+<!--                          z = matrix(density2, ncol=200, byrow=TRUE), type = "contour") -->
+
+<!-- fig <- contour_plot1 %>% add_trace(data=contour_plot2$data[[1]]) -->
+<!-- fig -->

@@ -1,0 +1,173 @@
+---
+output:
+  pdf_document: default
+  html_document: default
+---
+```{r}
+# Example of initializing parameters
+# Load the lars package and the diabetes dataset
+library(reshape2)
+library(lars)
+data(diabetes)
+library(GGally)
+
+library(ggplot2)
+library(gridExtra)
+
+library("rstan") # observe startup messages
+options(mc.cores = parallel::detectCores())
+rstan_options(auto_write = TRUE)
+
+library(rjags)
+#data
+X_matrix <- diabetes$x
+class(X_matrix) <- "matrix"
+y_vector <- diabetes$y
+
+X_design <- cbind(1, X_matrix)
+set.seed(123)
+split_ind <- sample(1:length(y_vector), size=round(length(y_vector)*0.8))
+y_train <- y_vector[split_ind]
+y_test <- y_vector[-split_ind]
+
+X_train <- X_design[split_ind,]
+X_test <- X_design[-split_ind,]
+
+
+
+K <- ncol(X_train)
+inits <- list(z = rep(0, K-1),
+              beta = rep(0, K),
+              sigma2temp = 1,
+              mu_beta = rep(0, K),
+              v0 = 1,
+              s0 = 1)
+
+data_list <- list(
+  N = dim(X_train)[1],  
+  K = dim(X_train)[2], 
+  x = X_train,
+  y = y_train,
+  Ik = diag(K),
+  C0 = diag(K)
+)
+```
+```{r}
+# Assuming your JAGS model code is in a file named 'model_code.txt'
+model_file <- "./prior_M2_ind.txt"
+model.fit <- jags.model(model_file,
+                    data = data_list,
+                    inits = inits,
+                    n.chains = 4)
+
+update(model.fit, n.iter = 2000)  # Burn-in
+model.samples <- coda.samples(model.fit,
+                        variable.names = c("z", "beta", "sigma2temp",
+                                           "beta_ind"), n.iter = 4000)
+
+print(summary(model.samples))
+
+
+
+```
+
+```{r}
+posterior_samples <- as.matrix(model.samples)
+
+posterior_mean <- apply(posterior_samples, 2, mean)
+posterior_ci <- apply(posterior_samples, 2, function(x) quantile(x, c(0.25, 0.75)))
+
+library(ggplot2)
+
+# Assuming df is a data frame with columns: Parameter, Mean, Lower_CI, Upper_CI
+df <- data.frame(Parameter = names(posterior_mean), Mean = posterior_mean, Lower_CI = posterior_ci[1,], Upper_CI = posterior_ci[2,])
+
+
+df.beta_ind <- df[12:22, ]
+df.beta_ind$Parameter <- factor(df.beta_ind$Parameter,
+                       levels = paste0('beta_ind[',11:1,']'))  # Specify the desired order
+
+beta.sigma <- ggplot(df.beta_ind[-c(2,3, 6,7, 9),], aes(x = Mean, y = Parameter)) +
+    geom_errorbarh(aes(xmin = Lower_CI, xmax = Upper_CI), height = 0.2, col='red')+
+  geom_point() +
+  labs(title = "Posterior Mean and CI", x = "Posterior Mean", y = "Parameters")+
+    theme(plot.title = element_text(hjust = 0.5))+
+   scale_x_continuous(limits = c(-250, 400), breaks = seq(-250, 400, by = 50))  # Set x-axis limits and ticks
+  # Center the title
+
+show(beta.sigma)
+
+
+df.z <- df[24:33, ]
+df.z$Parameter <- factor(df.z$Parameter,
+                       levels = paste0('z[',10:1,']'))  # Specify the
+z <- ggplot(df.z, aes(x = Mean, y = Parameter)) +
+  geom_point() +
+  labs(title = "Posterior Mean and CI", x = "Posterior Mean", y = "Parameters")+
+    theme(plot.title = element_text(hjust = 0.5))+
+  xlim(0,1)+# Center the title+
+ geom_vline(xintercept = 0.5, color = "red", linetype = "dashed")  # Add a red vertical line
+
+show(z)
+
+#ggsave("./plots/selection_beta_ind.pdf", beta.sigma,width = 8, height = 6)
+#ggsave("./plots/selection_z.pdf", z,width = 8, height = 6)
+```
+
+```{r}
+ttt <- lm(y_train~X_train)
+beta <- coef(ttt)
+print(beta)
+
+```
+
+```{r}
+
+# Get the coefficients (including intercept) from the model
+beta <- posterior_mean[12:22]
+beta <- coef(ttt)
+# Function to calculate R^2 and adjusted R^2
+calculate_r_squared <- function(beta, x, y) {
+  # Calculate predicted values
+  y_pred <- c(x %*% beta)
+  
+  # Calculate SSR and SST
+  SSR <- sum((y - y_pred)^2)
+  SST <- sum((y - mean(y))^2)
+  
+  # Calculate R^2
+  R_squared <- 1 - SSR / SST
+  
+  # Get the number of observations and predictors
+  n <- length(y)
+  k <- length(beta) - 1  # Exclude intercept
+  
+  # Calculate adjusted R^2
+  adjusted_R_squared <- 1 - (1 - R_squared) * (n - 1) / (n - k - 1)
+  print(y)
+  print(y_pred)
+  return(list(R_squared = R_squared, Adjusted_R_squared = adjusted_R_squared,
+              testerror=SSR))
+}
+
+# Calculate R^2 and adjusted R^2 using the function
+results <- calculate_r_squared(beta, X_test, y_test)
+
+# Print the results
+print(paste("R^2:", round(results$R_squared, 4)))
+print(paste("Adjusted R^2:", round(results$Adjusted_R_squared, 4)))
+print(results$testerror)
+```
+
+
+```{r}
+df.z <- df[grepl('z', df$Parameter), ]
+
+
+```
+
+```{r}
+data_ols <- data.frame(cbind(y_train, X_train[,-1]))
+
+ttt <- lm(y_train~., data=data_ols)
+```
